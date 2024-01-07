@@ -1,7 +1,7 @@
 {
 	"name": "webrtc-meet-for-stranger",
 	"version": "1.0.0",
-	"main": "app.js",
+	"main": "server.js",
 	"license": "MIT",
 	"scripts": {
 		"prebuild": "yarn tailwindcss --input tailwind.css --output public/css/style.css",

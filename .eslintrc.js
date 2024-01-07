@@ -3,9 +3,12 @@ module.exports = {
         "browser": true,
         "commonjs": true,
         "es2021": true,
-				"node": true,
-				"io": true
     },
+		"globals": {
+				"process": true,
+				"io": true
+
+		},
     "extends": "eslint:recommended",
     "overrides": [
         {
