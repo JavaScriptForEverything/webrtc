@@ -3,6 +3,7 @@ const livereload = require('livereload') 									// for reload browser
 const connectLivereload = require('connect-livereload') 	// for reload browser
 const express = require('express')
 
+const errorController = require('./controllers/errorController')
 const pageRouter = require('./routes/pageRoute')
 
 const publicDirectory = path.join(process.cwd(), 'public')
@@ -25,5 +26,8 @@ if(process.env.NODE_ENV === 'development') {
 
 
 app.use(pageRouter)
+
+app.use(errorController.errorHandler)
+app.all('*', errorController.pageNotFound)
 
 module.exports = app
