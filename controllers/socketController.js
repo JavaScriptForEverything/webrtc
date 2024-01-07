@@ -1,8 +1,11 @@
-module.exports = (io) => (socket) => {
-	console.log('socket connection established: ', socket.id)
+let connectedPeers = []
 
-	io.send('hi client')
-	socket.on('message', (data) => {
-		console.log(data)
+module.exports = (io) => (socket) => {
+	connectedPeers.push(socket.id)
+	console.log(connectedPeers)
+
+	socket.on('disconnect', () => {
+		connectedPeers = connectedPeers.filter(socketId => socket.id !== socketId)
+		console.log(connectedPeers)
 	})
 }

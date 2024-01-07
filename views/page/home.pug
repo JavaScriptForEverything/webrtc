@@ -9,7 +9,18 @@ html(lang="en")
 		script( defer type="module", src="/js/page/home.js") 
 
 	body 
-		h2 Home Page
-		h2(class='text-red-500') Home Page
-		h2(class='text-purple-500') Home Page
-		h2(class='text-purple-500') Home Page
+		div(class='h-screen grid grid-cols-12 grid-rows-12')
+			input(type='checkbox' id='layout' class='absolute peer/layout hidden')
+			div(name='left-panel' class='peer-checked/layout:hidden col-span-4 md:col-span-3 row-span-10 md:row-span-12 bg-blue-500')
+				p left panel
+				label(for='layout')
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 16.58L10.83 12l4.58-4.59L14 6l-6 6l6 6z"/></svg>
+
+			div(name='middle-section' class='peer-checked/layout:col-span-12 peer-checked/layout:[&>label]:block col-span-8 md:col-span-6 row-span-10 md:row-span-12 bg-orange-100 ')
+				label(for='layout' class=' hidden')
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17h18M3 12h18M3 7h18"/></svg>
+				p middle panel
+
+			div(name='right-panel' class='col-span-12 md:col-span-3 row-span-2 md:row-span-12 bg-slate-300  ')
+				p md: right panel
+
