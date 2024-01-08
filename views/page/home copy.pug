@@ -1,31 +1,22 @@
-doctype html
-html(lang="en")
-	head
-		meta(charset="UTF-8")
-		meta(name="viewport", content="width=device-width, initial-scale=1.0")
-		title #{title}
-		link(rel="stylesheet", href="/css/style.css")
-		script( defer src="/socket.io/socket.io.js") 
-		script( defer type="module", src="/js/page/home.js") 
+extends ../layout
+block body
+	div(class='h-screen grid grid-cols-12 grid-rows-12')
+		input(type='checkbox' id='layout' class='absolute peer/layout hidden')
+		div(name='left-panel' class='peer-checked/layout:hidden col-span-4 md:col-span-3 row-span-10 md:row-span-12 bg-blue-500')
+			div(class='flex items-center justify-between px-1 py-1 text-slate-50')
+				p WebRTC
+				label(for='layout' class='p-0.5 rounded-full bg-slate-100 hover:bg-slate-50 hover:scale-105 text-blue-500 cursor-pointer ')
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 16.58L10.83 12l4.58-4.59L14 6l-6 6l6 6z"/></svg>
 
-	body 
-		div(class='h-screen grid grid-cols-12 grid-rows-12')
-			input(type='checkbox' id='layout' class='absolute peer/layout hidden')
-			div(name='left-panel' class='peer-checked/layout:hidden col-span-4 md:col-span-3 row-span-10 md:row-span-12 bg-blue-500')
-				div(class='flex items-center justify-between px-1 py-1 text-slate-50')
-					p WebRTC
-					label(for='layout' class='p-0.5 rounded-full bg-slate-100 hover:bg-slate-50 hover:scale-105 text-blue-500 cursor-pointer ')
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 16.58L10.83 12l4.58-4.59L14 6l-6 6l6 6z"/></svg>
+		div(name='middle-section' class='peer-checked/layout:col-span-12 peer-checked/layout:[&_.hamburger]:block col-span-8 md:col-span-6 row-span-10 md:row-span-12 bg-orange-100 ')
+			div(class='flex items-center gap-2 px-1 bg-slate-50 text-slate-500')
+				label(for='layout'  
+					class='hamburger hidden cursor-pointer'
+					class='py-0.5 px-0.5 text-blue-500 bg-slate-100 border border-slate-300 rounded-full'
+				)
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17h18M3 12h18M3 7h18"/></svg>
+				p middle panel
 
-			div(name='middle-section' class='peer-checked/layout:col-span-12 peer-checked/layout:[&_.hamburger]:block col-span-8 md:col-span-6 row-span-10 md:row-span-12 bg-orange-100 ')
-				div(class='flex items-center gap-2 px-1 bg-slate-50 text-slate-500')
-					label(for='layout'  
-						class='hamburger hidden cursor-pointer'
-						class='py-0.5 px-0.5 text-blue-500 bg-slate-100 border border-slate-300 rounded-full'
-					)
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17h18M3 12h18M3 7h18"/></svg>
-					p middle panel
-
-			div(name='right-panel' class='col-span-12 md:col-span-3 row-span-2 md:row-span-12 bg-slate-300  ')
-				p md: right panel
+		div(name='right-panel' class='col-span-12 md:col-span-3 row-span-2 md:row-span-12 bg-slate-300  ')
+			p md: right panel
 

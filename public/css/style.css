@@ -544,6 +544,44 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
+
 .absolute {
   position: absolute;
 }
@@ -619,6 +657,16 @@ video {
   margin-bottom: 10rem;
 }
 
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
 .mb-1 {
   margin-bottom: 0.25rem;
 }
@@ -645,6 +693,10 @@ video {
 
 .mt-2 {
   margin-top: 0.5rem;
+}
+
+.mb-12 {
+  margin-bottom: 3rem;
 }
 
 .block {
@@ -850,6 +902,26 @@ video {
   border-color: rgb(147 197 253 / var(--tw-border-opacity));
 }
 
+.border-blue-500 {
+  --tw-border-opacity: 1;
+  border-color: rgb(59 130 246 / var(--tw-border-opacity));
+}
+
+.border-slate-500 {
+  --tw-border-opacity: 1;
+  border-color: rgb(100 116 139 / var(--tw-border-opacity));
+}
+
+.border-slate-400 {
+  --tw-border-opacity: 1;
+  border-color: rgb(148 163 184 / var(--tw-border-opacity));
+}
+
+.border-blue-600 {
+  --tw-border-opacity: 1;
+  border-color: rgb(37 99 235 / var(--tw-border-opacity));
+}
+
 .bg-blue-400\/30 {
   background-color: rgb(96 165 250 / 0.3);
 }
@@ -897,6 +969,29 @@ video {
   background-color: rgb(191 219 254 / var(--tw-bg-opacity));
 }
 
+.bg-blue-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(96 165 250 / var(--tw-bg-opacity));
+}
+
+.bg-orange-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(251 146 60 / var(--tw-bg-opacity));
+}
+
+.bg-slate-700\/80 {
+  background-color: rgb(51 65 85 / 0.8);
+}
+
+.bg-red-700\/60 {
+  background-color: rgb(185 28 28 / 0.6);
+}
+
+.bg-red-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+}
+
 .p-0 {
   padding: 0px;
 }
@@ -907,6 +1002,10 @@ video {
 
 .p-2 {
   padding: 0.5rem;
+}
+
+.p-8 {
+  padding: 2rem;
 }
 
 .px-0 {
@@ -1232,11 +1331,47 @@ video {
   color: rgb(29 78 216 / var(--tw-text-opacity));
 }
 
+.group:checked .group-checked\:block {
+  display: block;
+}
+
+.group:checked .group-checked\:hidden {
+  display: none;
+}
+
 .peer\/layout:checked ~ .peer-checked\/layout\:col-span-12 {
   grid-column: span 12 / span 12;
 }
 
 .peer\/layout:checked ~ .peer-checked\/layout\:hidden {
+  display: none;
+}
+
+.peer:checked ~ .peer-checked\:bg-slate-700\/80 {
+  background-color: rgb(51 65 85 / 0.8);
+}
+
+.peer\/microphone:checked ~ .peer-checked\/microphone\:bg-slate-700\/80 {
+  background-color: rgb(51 65 85 / 0.8);
+}
+
+.peer\/microphone:checked ~ .peer-checked\/microphone\:bg-slate-700\/90 {
+  background-color: rgb(51 65 85 / 0.9);
+}
+
+.peer\/camera:checked ~ .peer-checked\/camera\:bg-slate-700\/90 {
+  background-color: rgb(51 65 85 / 0.9);
+}
+
+.peer\/recording:checked ~ .peer-checked\/recording\:bg-slate-700\/90 {
+  background-color: rgb(51 65 85 / 0.9);
+}
+
+.peer\/flip-camera:checked ~ .peer-checked\/flip-camera\:bg-slate-700\/90 {
+  background-color: rgb(51 65 85 / 0.9);
+}
+
+.peer\/microphone:checked ~ .peer-checked\/microphone\:first\:hidden:first-child {
   display: none;
 }
 
@@ -1254,6 +1389,75 @@ video {
   }
 }
 
+.peer\/microphone:checked ~ .peer-checked\/microphone\:\[\&\*\:first-child\]\:hidden*:first-child {
+  display: none;
+}
+
+.checked\:\[\&\+label\]\:w-12+label:checked {
+  width: 3rem;
+}
+
+.\[\&\.active\]\:pointer-events-none.active {
+  pointer-events: none;
+}
+
+.\[\&\.called_\.called\]\:hidden.called .called {
+  display: none;
+}
+
+.peer\/microphone:checked ~ .peer-checked\/microphone\:\[\&\:first-child\]\:hidden:first-child {
+  display: none;
+}
+
+.\[\&\>\*\:first-child\]\:block>*:first-child {
+  display: block;
+}
+
+.\[\&\>\*\:first-child\]\:hidden>*:first-child {
+  display: none;
+}
+
+.peer\/microphone:checked ~ .peer-checked\/microphone\:\[\&\>\*\:first-child\]\:hidden>*:first-child {
+  display: none;
+}
+
+.peer\/camera:checked ~ .peer-checked\/camera\:\[\&\>\*\:first-child\]\:hidden>*:first-child {
+  display: none;
+}
+
+.peer\/recording:checked ~ .peer-checked\/recording\:\[\&\>\*\:first-child\]\:hidden>*:first-child {
+  display: none;
+}
+
+.\[\&\>\*\:nth-child\(2\)\]\:hidden>*:nth-child(2) {
+  display: none;
+}
+
+.peer\/microphone:checked ~ .peer-checked\/microphone\:\[\&\>\*\:nth-child\(2\)\]\:block>*:nth-child(2) {
+  display: block;
+}
+
+.peer\/camera:checked ~ .peer-checked\/camera\:\[\&\>\*\:nth-child\(2\)\]\:block>*:nth-child(2) {
+  display: block;
+}
+
+.peer\/recording:checked ~ .peer-checked\/recording\:\[\&\>\*\:nth-child\(2\)\]\:block>*:nth-child(2) {
+  display: block;
+}
+
+.\[\&_\.active\:active\]\:bg-red-600 .active:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 38 38 / var(--tw-bg-opacity));
+}
+
+.\[\&_\.active\]\:pointer-events-none .active {
+  pointer-events: none;
+}
+
+.\[\&_\.active\]\:block .active {
+  display: block;
+}
+
 .\[\&_\.active\]\:scale-125 .active {
   --tw-scale-x: 1.25;
   --tw-scale-y: 1.25;
@@ -1263,6 +1467,15 @@ video {
 .\[\&_\.active\]\:bg-red-500 .active {
   --tw-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+}
+
+.\[\&_\.active\]\:active\:bg-red-600:active .active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 38 38 / var(--tw-bg-opacity));
+}
+
+.\[\&_\.called\]\:hidden .called {
+  display: none;
 }
 
 .peer\/layout:checked ~ .peer-checked\/layout\:\[\&_\.hamburger\]\:block .hamburger {

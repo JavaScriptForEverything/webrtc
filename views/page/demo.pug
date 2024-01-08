@@ -1,0 +1,79 @@
+extends ../layout
+block script
+	script( defer src='/js/page/demo.js')
+	style.
+		input[type=checkbox] {
+			appearance: none;
+			width: 2rem;
+			height: 2rem;
+			background: #8f8f9d;
+			cursor: pointer;
+		}
+		input[type=checkbox]:hover {
+			background: gray;
+		}
+		input[type=checkbox]:checked {
+			background: blue;
+		}
+		.box {
+			border: 1px solid red;
+			position:relative;
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		input[type=checkbox] + svg {
+			position: absolute;
+			width: 2rem;
+			height: 2rem;
+			color: red;
+			display: none;
+			cursor: pointer;
+		}
+		input[type=checkbox]:checked + svg {
+			display: block;
+		}
+
+		.box + label {
+			font-size: 2rem;
+			color: #8f8f9d;
+			cursor: pointer;
+		}
+
+		/*
+		input[type='checkbox'] {
+			width: 2rem;
+			height: 2rem;
+			accent-color: red;
+		}
+		input[type='checkbox'] + label[for='checkbox']{
+			color: gray;
+			font-size: 2rem;
+			margin-left: 0.5rem;
+		}
+		input[type='checkbox']:checked + label[for='checkbox']{
+			color: red;
+		}
+		*/
+
+
+
+block body 
+	p(class='text-red-500 mb-12') 
+
+	//- input(type='checkbox' id='checkbox' ) 
+	//- label(for='checkbox') Checkbox
+
+	//- input(type='radio' id='radio' checked) 
+	//- label(for='radio') radio
+
+	//- progress(value=50 max=100)
+	//- input(type='range')
+
+
+
+	label(class='box' for='checkbox')
+		input(type='checkbox' id='checkbox' checked) 
+		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M21 7L9 19l-5.5-5.5l1.41-1.41L9 16.17L19.59 5.59z"/></svg>
+	label(for='checkbox') Checkbox
