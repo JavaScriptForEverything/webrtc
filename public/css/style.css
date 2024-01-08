@@ -614,6 +614,22 @@ video {
   right: 0.625rem;
 }
 
+.right-4 {
+  right: 1rem;
+}
+
+.top-2 {
+  top: 0.5rem;
+}
+
+.top-4 {
+  top: 1rem;
+}
+
+.top-3 {
+  top: 0.75rem;
+}
+
 .col-span-12 {
   grid-column: span 12 / span 12;
 }
@@ -1058,6 +1074,11 @@ video {
   padding-right: 0.75rem;
 }
 
+.py-1\.5 {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+
 .pl-3 {
   padding-left: 0.75rem;
 }
@@ -1080,6 +1101,11 @@ video {
 
 .pt-2 {
   padding-top: 0.5rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 .font-light {
@@ -1343,6 +1369,14 @@ video {
   grid-column: span 12 / span 12;
 }
 
+.peer\/call:checked ~ .peer-checked\/call\:block {
+  display: block;
+}
+
+.peer\/call:checked ~ .peer-checked\/call\:flex {
+  display: flex;
+}
+
 .peer\/layout:checked ~ .peer-checked\/layout\:hidden {
   display: none;
 }
@@ -1371,6 +1405,20 @@ video {
   background-color: rgb(51 65 85 / 0.9);
 }
 
+.peer\/play-pause:checked ~ .peer-checked\/play-pause\:bg-slate-700\/90 {
+  background-color: rgb(51 65 85 / 0.9);
+}
+
+.peer\/call:checked ~ .peer-checked\/call\:bg-red-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+}
+
+.peer\/call:checked ~ .peer-checked\/call\:text-red-500 {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity));
+}
+
 .peer\/microphone:checked ~ .peer-checked\/microphone\:first\:hidden:first-child {
   display: none;
 }
@@ -1390,6 +1438,10 @@ video {
 }
 
 .peer\/microphone:checked ~ .peer-checked\/microphone\:\[\&\*\:first-child\]\:hidden*:first-child {
+  display: none;
+}
+
+.peer\/call:checked ~ .peer-checked\/call\:\[\&\*\>\:first-child\]\:hidden*>:first-child {
   display: none;
 }
 
@@ -1429,6 +1481,18 @@ video {
   display: none;
 }
 
+.peer\/play-pause:checked ~ .peer-checked\/play-pause\:\[\&\>\*\:first-child\]\:hidden>*:first-child {
+  display: none;
+}
+
+.peer\/call:checked ~ .peer-checked\/call\:\[\&\>\*\:first-child\]\:hidden>*:first-child {
+  display: none;
+}
+
+.peer\/call:checked ~ .peer-checked\/call\:\[\&\>\*\:not\(\.active\)\]\:hidden>*:not(.active) {
+  display: none;
+}
+
 .\[\&\>\*\:nth-child\(2\)\]\:hidden>*:nth-child(2) {
   display: none;
 }
@@ -1443,6 +1507,18 @@ video {
 
 .peer\/recording:checked ~ .peer-checked\/recording\:\[\&\>\*\:nth-child\(2\)\]\:block>*:nth-child(2) {
   display: block;
+}
+
+.peer\/play-pause:checked ~ .peer-checked\/play-pause\:\[\&\>\*\:nth-child\(2\)\]\:block>*:nth-child(2) {
+  display: block;
+}
+
+.\[\&\>\*\:nth-child\(2n\)\]\:hidden>*:nth-child(2n) {
+  display: none;
+}
+
+.peer\/call:checked ~ .peer-checked\/call\:\[\&\>\*\:nth-child\(2n\)\]\:hidden>*:nth-child(2n) {
+  display: none;
 }
 
 .\[\&_\.active\:active\]\:bg-red-600 .active:active {
