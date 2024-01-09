@@ -7,6 +7,10 @@ let state = {
 	allowConnectionsFromStrangers: false,
 }
 
+
+export const getState = () => state
+
+
 export const setSocketId = (socketId) => {
 	state = { ...state, socketId }
 }
