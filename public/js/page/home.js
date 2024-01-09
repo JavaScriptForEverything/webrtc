@@ -1,3 +1,5 @@
+import { setLocalStream } from '../module/store'
+
 const socket = io('/')
 
 socket.on('connect', () => {
@@ -10,3 +12,4 @@ socket.on('connect', () => {
 })
 
 
+setLocalStream('ok')
