@@ -6,7 +6,14 @@ module.exports = (io) => (socket) => {
 
 	socket.on('pre-offer', ({ callType, calleePersonalCode }) => {
 		const connectedPeer = connectedPeers.find( peerSocketId => peerSocketId === calleePersonalCode)
-		if(!connectedPeer) return console.log('callee send not existing calleePersonalCode')
+		// if(!connectedPeer) return console.log('calleePersonalCode missing')
+
+		const errorData = {
+			preOfferAnswer: 'CALLEE_NOT_FOUND',
+			calleeSocketId: socket.id  						// pass the same variable that frontend validating for
+		}
+		if(!connectedPeer) return socket.emit('pre-offer-answer', errorData)
+
 
 		const data = {
 			callType,
@@ -14,6 +21,24 @@ module.exports = (io) => (socket) => {
 		}
 
 		io.to(calleePersonalCode).emit('pre-offer', data)
+	})
+
+	socket.on('pre-offer-answer', ({ callerSocketId, preOfferAnswer }) => {
+		const connectedPeer = connectedPeers.find( peerSocketId => peerSocketId === callerSocketId)
+		if(!connectedPeer) return console.log('callee can not send answer back because callerSocketId not found ')
+
+		// const errorData = {
+		// 	preOfferAnswer: 'CALL_UNAVAILABLE',
+		// 	calleeSocketId: socket.id,
+		// }
+		// if(!connectedPeer) return socket.emit('pre-offer-answer', errorData)
+
+
+		const data = {
+			preOfferAnswer,
+			calleeSocketId: socket.id,
+		}
+		io.to(callerSocketId).emit('pre-offer-answer', data)
 	})
 
 

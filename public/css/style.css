@@ -630,6 +630,10 @@ video {
   grid-column: span 8 / span 8;
 }
 
+.col-span-6 {
+  grid-column: span 6 / span 6;
+}
+
 .row-span-10 {
   grid-row: span 10 / span 10;
 }
@@ -769,8 +773,24 @@ video {
   width: 7rem;
 }
 
+.w-64 {
+  width: 16rem;
+}
+
+.w-\[280px\] {
+  width: 280px;
+}
+
+.w-52 {
+  width: 13rem;
+}
+
 .max-w-\[80\%\] {
   max-width: 80%;
+}
+
+.max-w-52 {
+  max-width: 13rem;
 }
 
 .flex-1 {
@@ -835,6 +855,12 @@ video {
 
 .overflow-y-scroll {
   overflow-y: scroll;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rounded {

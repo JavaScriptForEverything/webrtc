@@ -12,9 +12,16 @@ export const registerSocketEvents = (socket) => {
 		store.setSocketId( socket.id )
 		ui.updatePersonalCode( socket.id )
 
+		// Step-2: callee side
 		socket.on('pre-offer', (data) => {
 			if(!data.callerSocketId) return console.log('server must have to send callerSocketId')
 			webRTCHandler.handlePreOffer(data)
+		})
+
+		// Step-4: caller side
+		socket.on('pre-offer-answer', (data) => {
+			if(!data.calleeSocketId) return console.log('server must have to send calleeSocketId')
+			webRTCHandler.handlePreOfferAnswer(data)
 		})
 
 		socket.on('message', (data) => {
@@ -25,8 +32,15 @@ export const registerSocketEvents = (socket) => {
 }
 
 
+// Step-1: caller side
 export const sendPreOffer = (data) => {
 	if(!socketIo)	return console.log('socketIo is null')
 
 	socketIo.emit('pre-offer', data)
+}
+
+// Step-3: caller side again
+export const sendPreOfferAnswer = (data) => {
+	socketIo.emit('pre-offer-answer', data)
+
 }
