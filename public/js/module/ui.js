@@ -89,3 +89,26 @@ export const closeErrorCallDialog = () => {
 	errorCallDialog.style.display = 'none'
 }
 // showErrorCallDialog({ title: 'testing', message: 'again testing' })
+
+
+
+export const updateLocalStream = (stream) => {
+	const localVideo = $('[name=local-video]')	
+	localVideo.srcObject = stream
+
+	localVideo.addEventListener('loadedmetadata', () => {
+		localVideo.autoplay = true
+		localVideo.play()
+	})
+}
+
+export const updateRemoteStream = (stream) => {
+	const remoteVideo = $('[name=remote-video]')	
+	remoteVideo.srcObject = stream
+
+	remoteVideo.addEventListener('loadedmetadata', () => {
+		remoteVideo.autoplay = true
+		remoteVideo.play()
+	})
+	
+}

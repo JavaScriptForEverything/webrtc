@@ -1,6 +1,7 @@
 import * as store from './store.js'
 import * as ui from './ui.js'
 import * as webRTCHandler from './webRTCHandler.js'
+import * as constants from './constants.js'
 
 let socketIo = null
 
@@ -24,9 +25,13 @@ export const registerSocketEvents = (socket) => {
 			webRTCHandler.handlePreOfferAnswer(data)
 		})
 
-		socket.on('message', (data) => {
-			console.log(data)
-			socket.send(`I got your message: you sent: ${data}`)
+		// Step-6: WebRTC-step-2: caller get offer
+		socket.on('webrtc-signaling', (data) => {
+			switch( data.type ) {
+				case constants.webRTCSignaling.OFFER: return webRTCHandler.handleWebRTCOffer( data )
+				case constants.webRTCSignaling.ANSWER: return webRTCHandler.handleWebRTCAnswer( data )
+				case constants.webRTCSignaling.ICE_CANDIDATE: return webRTCHandler.handleWebRTCIceCandidate( data )
+			}
 		})
 	})
 }
@@ -43,4 +48,9 @@ export const sendPreOffer = (data) => {
 export const sendPreOfferAnswer = (data) => {
 	socketIo.emit('pre-offer-answer', data)
 
+}
+
+// Step-5: WebRTC-step-1: callee Send offer
+export const sendDataUsingWebRTCSignaling = (data) => {
+	socketIo.emit('webrtc-signaling', data)
 }

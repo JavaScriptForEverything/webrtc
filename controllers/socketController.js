@@ -42,6 +42,13 @@ module.exports = (io) => (socket) => {
 	})
 
 
+	socket.on('webrtc-signaling', (data) => {
+		const connectedPeer = connectedPeers.find( peerSocketId => peerSocketId === data.connectedUserSocketId)
+		if(!connectedPeer) return console.log('webRTC must send connectedUserSocketId')
+
+		io.to(data.connectedUserSocketId).emit('webrtc-signaling', data)
+	})
+
 	socket.on('disconnect', () => {
 		connectedPeers = connectedPeers.filter(socketId => socket.id !== socketId)
 		console.log(connectedPeers)

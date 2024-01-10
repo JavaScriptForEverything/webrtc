@@ -81,10 +81,8 @@ block script
 		div(name='middle-section' class='bg-slate-50 col-span-6') 
 			div(class='h-full border border-red-300')
 				div(class='relative aspect-video border border-slate-300 bg-blue-400')
-					div(class='absolute w-40 aspect-video border border-blue-300 ')
-						video(name='local-video' src="/videos/video.mp4" muted hidden) 
-
-					video(name='remote-video' src="/videos/video.mp4" hidden) 
+					video(name='remote-video' src="/videos/video.mp4" class='w-full opacity-95') 
+					video(name='local-video' src="/videos/video2.mp4" muted class='absolute aspect-video h-20 top-0 border border-slate-300 ') 
 
 					input(type='checkbox' id='call-button' class='peer/call' hidden)
 					div(name='recording-controller' class='hidden peer-checked/call:flex absolute right-3 top-3 bg-slate-700/60 text-slate-50 px-3 py-1.5 rounded-md gap-2 items-center')

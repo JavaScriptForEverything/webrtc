@@ -12,3 +12,10 @@ export const preOfferAnswer = {
 	CALL_REJECTED 	: 'CALL_REJECTED',
 	CALL_CLOSED 	: 'CALL_CLOSED',
 }
+
+
+export const webRTCSignaling = {
+	OFFER: 'OFFER',
+	ANSWER: 'ANSWER',
+	ICE_CANDIDATE: 'ICE_CANDIDATE',
+}

@@ -8,6 +8,8 @@ import * as ui from '../module/ui.js'
 const socket = io('/')
 wss.registerSocketEvents(socket) 	// Handling all WebSocket events in wss.js file
 
+webRTCHandler.getLocalPreview()
+
 const leftPanel = $('[name=left-panel]')
 const socketIdCopyButton = $('[name=socket-id-copy-button]')
 const personalCodeInput = $('[name=personal-code-input]')
