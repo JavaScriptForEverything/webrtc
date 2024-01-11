@@ -17,11 +17,27 @@ const outgoingCallDialog = $('[name=outgoing-call-dialog]')
 const errorCallDialog = $('[name=error-call-dialog]')
 
 const callInputCheckbox = $('#call-button')
+
+
+
 callInputCheckbox.checked = false
+
+
+
 
 export const toggleCallStyle = (isCalled = false) => {
 	callInputCheckbox.checked = isCalled
 }
+
+
+// export const toggleMicrophoneOnOff = (isCalled = false) => {
+// 	microphoneInputCheckbox.checked = isCalled
+// }
+// toggleMicrophoneOnOff(true)
+
+
+
+
 
 
 export const updatePersonalCode = (socketId) => {
@@ -98,6 +114,7 @@ export const updateLocalStream = (stream) => {
 
 	localVideo.addEventListener('loadedmetadata', () => {
 		localVideo.autoplay = true
+		// localVideo.muted = true
 		localVideo.play()
 	})
 }

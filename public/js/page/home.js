@@ -22,8 +22,32 @@ const allowFromStrangerInput = $('[name=allow-from-stranger] input')
 const stopRecordingButton = $('[name=stop-recording]')
 const callButton = $('button[name=call]')
 
+const cameraIcon = $('label[for=camera-on-off]')
+const cameraInputCheckbox = $('#camera-on-off')
+const microphoneIcon = $('label[for=microphone-on-off]')
+const microphoneInputCheckbox = $('#microphone-on-off')
+const callIcon = $('button[name=call]')
+const screenSharingIcon = $('label[for=flip-camera]')
+const screenSharingInputCheckbox = $('#flip-camera')
+const recordingIcon = $('label[for=recording]')
+const recordingInputCheckbox = $('#recording')
+
+
+
+
 // Reset to default
 personalCodeInput.value = ''
+cameraInputCheckbox.checked = false
+microphoneInputCheckbox.checked = false 	
+
+export const toggleScreenSharingStyle = (checked=false) => {
+	screenSharingInputCheckbox.checked = checked
+}
+
+
+
+
+
 
 socketIdCopyButton.addEventListener('click', () => {
 	navigator.clipboard.writeText(store.getState().socketId)
@@ -75,6 +99,7 @@ allowFromStrangerInput.addEventListener('change', (evt) => {
 })
 
 
+
 export const lockLeftPanel = () => {
 	leftPanel.classList.add('active') 		// lock panel in caller side
 }
@@ -99,3 +124,44 @@ stopRecordingButton.addEventListener('click', (evt) => {
 	closeCallHandler()
 	// save recorded files too
 })
+
+
+cameraIcon.addEventListener('click', (evt) => {
+	evt.preventDefault()
+	const { localStream } = store.getState()
+
+	localStream.getVideoTracks().forEach( track => {
+		track.enabled = !track.enabled 
+		cameraInputCheckbox.checked = !track.enabled
+	})
+})
+
+microphoneIcon.addEventListener('click', (evt) => {
+	evt.preventDefault()
+	const { localStream } = store.getState()
+
+	localStream.getAudioTracks().forEach( track => {
+		track.enabled = !track.enabled 
+		microphoneInputCheckbox.checked = !track.enabled
+	})
+})
+
+callIcon.addEventListener('click', (evt) => {
+	evt.preventDefault()
+	
+	webRTCHandler.closingCall()
+})
+
+screenSharingIcon.addEventListener('click', (evt) => {
+	evt.preventDefault()
+	
+	const { screenSharingActive } = store.getState()
+	webRTCHandler.switchBetweenCameraAndScreenSharing( screenSharingActive )
+})
+recordingIcon.addEventListener('click', (evt) => {
+	evt.preventDefault()
+	
+	console.log('recordingIcon ')
+})
+
+

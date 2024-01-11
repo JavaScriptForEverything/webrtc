@@ -156,6 +156,7 @@ export const rejectCallHandler = (evt) => {
 		now send that id back with answer
 */ 
 export const sendPreOfferAnswer = (preOfferAnswer) => {
+	if(!connectedUserDetails) return
 	
 	const data = {
 		callerSocketId: connectedUserDetails.socketId,
@@ -269,4 +270,58 @@ export const handleWebRTCIceCandidate = async ({ candidate }) => {
 	if(!candidate) return console.log('no ice candidate came back')	
 
 	await peerConnection.addIceCandidate(candidate)
+}
+
+
+
+export const switchBetweenCameraAndScreenSharing = async (screenSharingActive) => {
+
+	if(screenSharingActive) {
+		const { localStream } = store.getState()
+		const localStreamTrack = localStream.getVideoTracks()[0]
+
+		const senders = peerConnection.getSenders()
+		const sender = senders.find(sender => sender.track.kind === localStreamTrack.kind)
+		if(!sender) return console.log('localStreamTrack not found')
+
+		ui.updateLocalStream( localStream ) 		// update scream in self camera
+		sender.replaceTrack(localStreamTrack) 	// change stream track in other peer side
+		store.getState().screenSharingStream.getTracks().forEach( track => track.stop() ) 	// Stop streaming
+		store.setScreenSharingActive(!screenSharingActive)
+		home.toggleScreenSharingStyle(false)
+
+		// 
+	} else {
+		const screenSharingStream = await navigator.mediaDevices.getDisplayMedia({ video: true })
+		const screenSharingVideoTrack = screenSharingStream.getVideoTracks()[0]
+
+		const senders = peerConnection.getSenders()
+		const sender = senders.find( sender => sender.track.kind == screenSharingVideoTrack.kind)
+		if(!sender) return console.log('screenSharingSender not found')
+		sender.replaceTrack(screenSharingVideoTrack)
+
+		store.setScreenSharingStream( screenSharingStream )
+		store.setScreenSharingActive(!screenSharingActive)
+		ui.updateLocalStream( screenSharingStream )
+		home.toggleScreenSharingStyle(true)
+	}
+	
+}
+
+
+export const closingCall = () => {
+	const { localStream } = store.getState()
+	if(!localStream) return
+
+	const localStreamTrack = localStream.getTracks()[0]
+
+	const senders = peerConnection.getSenders()
+	const sender = senders.find( sender => sender.track.kind === localStreamTrack.kind )
+	if(!sender) return console.log('sender not found for closingCall')
+	console.log(sender)
+
+	// const stream = new MediaStream()
+	// remoteStream.getTracks().forEach( track => track.stop() )
+	// store.setRemoteStream(null)
+	// ui.updateRemoteStream(stream)
 }
