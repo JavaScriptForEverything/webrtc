@@ -4,6 +4,7 @@ import * as store from '../module/store.js'
 import * as webRTCHandler from '../module/webRTCHandler.js'
 import * as constants from '../module/constants.js'
 import * as ui from '../module/ui.js'
+import * as elements from '../module/elements.js'
 
 const socket = io('/')
 wss.registerSocketEvents(socket) 	// Handling all WebSocket events in wss.js file
@@ -32,8 +33,28 @@ const screenSharingInputCheckbox = $('#flip-camera')
 const recordingIcon = $('label[for=recording]')
 const recordingInputCheckbox = $('#recording')
 
+const messageContainer = $('[name=message-container]')
+const sendMessageContainer = $('[name=send-message-container]')
+// const theirMessage = $('[name=their-message]')
+// const yourMessage = $('[name=your-message]')
+const sendMessageInput = $('input[name=send-message-input]')
+const sendMessageButton = $('button[name=send-message-button]')
+
+// const message = `<img src onerror="alert('hi message')" />`
+// // const message = `<p class='text-red-500'>Hi</p>`
+// 	ui.createYourMessage(messageContainer, message)
+// 	ui.createTheirMessage(messageContainer, 'Got it')
 
 
+export const enableMessagePanel = () => {
+	sendMessageContainer.style.pointerEvents = 'auto'
+}
+export const addYourMessage = (message) => {
+	elements.createYourMessage(messageContainer, message)
+}
+export const addTheirMessage = (message) => {
+	elements.createTheirMessage(messageContainer, message)
+}
 
 // Reset to default
 personalCodeInput.value = ''
@@ -165,3 +186,20 @@ recordingIcon.addEventListener('click', (evt) => {
 })
 
 
+
+const sendMessageHandler = (message) => {
+	webRTCHandler.sendMessageUsingDataChannel(message)	
+	addYourMessage(message)
+	sendMessageInput.value = ''
+}
+sendMessageInput.addEventListener('keydown', (evt) => {
+	const message = evt.target.value
+
+	if(evt.key === 'Enter') {
+		sendMessageHandler(message)
+	}
+})
+sendMessageButton.addEventListener('click', () => {
+	const message = sendMessageInput.value
+	sendMessageHandler(message)
+})

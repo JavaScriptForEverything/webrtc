@@ -11,6 +11,7 @@ let connectedUserDetails = null
 */
 
 let peerConnection = null
+let dataChannel = null
 
 
 
@@ -58,9 +59,11 @@ const createPeerConnection = () => {
 	}
 	peerConnection = new RTCPeerConnection(configuration)	
 
+	// datachannel: Step-1: create channel
+	dataChannel = peerConnection.createDataChannel('chat')
+
 	/* Step-7: webrtc-step-3:
-			After share offer and answer between peers, we must  share ice candidate too (which is network details) 
-	*/
+			After share offer and answer between peers, we must  share ice candidate too (which is network details) */
 	peerConnection.addEventListener('icecandidate', (evt) => {
 		if(!evt.candidate) return
 
@@ -82,7 +85,6 @@ const createPeerConnection = () => {
 	const remoteStream = new MediaStream()
 	store.setRemoteStream( remoteStream )
 	ui.updateRemoteStream( remoteStream )
-
 	peerConnection.addEventListener('track', (evt) => {
 		remoteStream.addTrack(evt.track)
 	})
@@ -96,6 +98,24 @@ const createPeerConnection = () => {
 			peerConnection.addTrack( track, localStream )
 		}
 	}
+
+
+	// datachannel: Step-2: listen to dataChannel if created on
+	peerConnection.addEventListener('datachannel', ({ channel }) => {
+
+		// datachannel: Step-4: listen to dataChannel connection === io.on('connect)
+		channel.addEventListener('open', () => {
+			// console.log('data channel created')
+			home.enableMessagePanel()
+
+			channel.addEventListener('message', (evt) => {
+				const message = JSON.parse(evt.data)
+				home.addTheirMessage(message)
+				// console.log(message)
+			})
+		})
+
+	})
 
 }
 
@@ -308,6 +328,12 @@ export const switchBetweenCameraAndScreenSharing = async (screenSharingActive) =
 	
 }
 
+// datachannel: Step-3: send data via data channel as string
+export const sendMessageUsingDataChannel = (message) => {
+	const stringify = JSON.stringify(message)
+	dataChannel.send(stringify) 	// network can't send object, must be string
+}
+
 
 export const closingCall = () => {
 	const { localStream } = store.getState()
@@ -325,3 +351,5 @@ export const closingCall = () => {
 	// store.setRemoteStream(null)
 	// ui.updateRemoteStream(stream)
 }
+
+
