@@ -5,6 +5,7 @@ import * as webRTCHandler from '../module/webRTCHandler.js'
 import * as constants from '../module/constants.js'
 import * as ui from '../module/ui.js'
 import * as elements from '../module/elements.js'
+import * as recording from '../module/recording.js'
 
 const socket = io('/')
 wss.registerSocketEvents(socket) 	// Handling all WebSocket events in wss.js file
@@ -20,31 +21,44 @@ const strangerChatButton = $('[name=stranger-chat-button]')
 const strangerVideoCallButton = $('[name=stranger-video-call-button]')
 const allowFromStrangerInput = $('[name=allow-from-stranger] input')
 
-const stopRecordingButton = $('[name=stop-recording]')
-const callButton = $('button[name=call]')
-
-const cameraIcon = $('label[for=camera-on-off]')
-const cameraInputCheckbox = $('#camera-on-off')
+const callPanel = $('[name=call-panel]')
 const microphoneIcon = $('label[for=microphone-on-off]')
 const microphoneInputCheckbox = $('#microphone-on-off')
+const cameraIcon = $('label[for=camera-on-off]')
+const cameraInputCheckbox = $('#camera-on-off')
 const callIcon = $('button[name=call]')
 const screenSharingIcon = $('label[for=flip-camera]')
 const screenSharingInputCheckbox = $('#flip-camera')
 const recordingIcon = $('label[for=recording]')
 const recordingInputCheckbox = $('#recording')
+const recordingPanel = $('[name=recording-panel]')
+const stopRecordingButton = $('[name=stop-recording]')
+const recordingPayPauseButton = $('[for=play-pause]')
+const recordingPlayPauseInputCheckbox = $('#play-pause')
 
 const messageContainer = $('[name=message-container]')
 const sendMessageContainer = $('[name=send-message-container]')
-// const theirMessage = $('[name=their-message]')
-// const yourMessage = $('[name=your-message]')
 const sendMessageInput = $('input[name=send-message-input]')
 const sendMessageButton = $('button[name=send-message-button]')
 
-// const message = `<img src onerror="alert('hi message')" />`
-// // const message = `<p class='text-red-500'>Hi</p>`
-// 	ui.createYourMessage(messageContainer, message)
-// 	ui.createTheirMessage(messageContainer, 'Got it')
 
+// Reset to default
+personalCodeInput.value = ''
+microphoneInputCheckbox.checked = false 	
+cameraInputCheckbox.checked = false
+recordingInputCheckbox.checked = false
+
+
+
+
+
+
+export const lockLeftPanel = () => {
+	leftPanel.classList.add('active') 		// lock panel in caller side
+}
+export const unlockLeftPanel = () => {
+	leftPanel.classList.remove('active') 	// unloack panel in caller side
+}
 
 export const enableMessagePanel = () => {
 	sendMessageContainer.style.pointerEvents = 'auto'
@@ -56,16 +70,19 @@ export const addTheirMessage = (message) => {
 	elements.createTheirMessage(messageContainer, message)
 }
 
-// Reset to default
-personalCodeInput.value = ''
-cameraInputCheckbox.checked = false
-microphoneInputCheckbox.checked = false 	
-
 export const toggleScreenSharingStyle = (checked=false) => {
 	screenSharingInputCheckbox.checked = checked
 }
 
 
+
+
+export const isAudioCall = (isAudio = true) => {
+	callPanel.style.display = 'flex'
+	callPanel.classList.toggle('called', isAudio)
+}
+
+// isAudioCall(false)
 
 
 
@@ -78,11 +95,11 @@ personalChatButton.addEventListener('click', (evt) => {
 	const calleePersonalCode = personalCodeInput.value 
 	if(!calleePersonalCode) return console.log('calleePersonalCode is empty')
 
-	const args = {
+	const data = {
 		callType: constants.callType.PERSONAL_CHAT_CODE,
 		calleePersonalCode
 	}
-	webRTCHandler.sendPreOffer(args)
+	webRTCHandler.sendPreOffer(data)
 })
 personalVideoCallButton.addEventListener('click', (evt) => {
 	const calleePersonalCode = personalCodeInput.value 
@@ -121,13 +138,6 @@ allowFromStrangerInput.addEventListener('change', (evt) => {
 
 
 
-export const lockLeftPanel = () => {
-	leftPanel.classList.add('active') 		// lock panel in caller side
-}
-export const unlockLeftPanel = () => {
-	leftPanel.classList.remove('active') 	// unloack panel in caller side
-}
-
 const closeCallHandler = () => {
 	// Step-1: stop call from caller side
 	ui.toggleCallStyle(false) 				
@@ -140,12 +150,15 @@ const closeCallHandler = () => {
 	unlockLeftPanel()
 }
 
-callButton.addEventListener('click',  closeCallHandler)
-stopRecordingButton.addEventListener('click', (evt) => {
-	closeCallHandler()
-	// save recorded files too
-})
+microphoneIcon.addEventListener('click', (evt) => {
+	evt.preventDefault()
+	const { localStream } = store.getState()
 
+	localStream.getAudioTracks().forEach( track => {
+		track.enabled = !track.enabled 
+		microphoneInputCheckbox.checked = !track.enabled
+	})
+})
 
 cameraIcon.addEventListener('click', (evt) => {
 	evt.preventDefault()
@@ -154,16 +167,6 @@ cameraIcon.addEventListener('click', (evt) => {
 	localStream.getVideoTracks().forEach( track => {
 		track.enabled = !track.enabled 
 		cameraInputCheckbox.checked = !track.enabled
-	})
-})
-
-microphoneIcon.addEventListener('click', (evt) => {
-	evt.preventDefault()
-	const { localStream } = store.getState()
-
-	localStream.getAudioTracks().forEach( track => {
-		track.enabled = !track.enabled 
-		microphoneInputCheckbox.checked = !track.enabled
 	})
 })
 
@@ -179,10 +182,48 @@ screenSharingIcon.addEventListener('click', (evt) => {
 	const { screenSharingActive } = store.getState()
 	webRTCHandler.switchBetweenCameraAndScreenSharing( screenSharingActive )
 })
+
+const showRecordingPanel = () => {
+	recordingInputCheckbox.checked = true
+	recordingPanel.style.display = 'flex'
+}
+const hideRecordingPanel = () => {
+	recordingInputCheckbox.checked = false
+	recordingPanel.style.display = 'none'
+}
+
+
 recordingIcon.addEventListener('click', (evt) => {
 	evt.preventDefault()
-	
-	console.log('recordingIcon ')
+
+	if(recordingInputCheckbox.checked === true) {
+		hideRecordingPanel()
+		recording.stopRecording()
+		return 
+	}
+
+	showRecordingPanel()
+	recording.startRecording()
+})
+stopRecordingButton.addEventListener('click', (evt) => {
+	evt.preventDefault()
+	hideRecordingPanel()
+	recording.stopRecording()
+})
+
+recordingPayPauseButton.addEventListener('click', (evt) => {
+	evt.preventDefault()
+
+	if(recordingPlayPauseInputCheckbox.checked === true) {
+		recordingPlayPauseInputCheckbox.checked = false
+		recording.pauseRecording()
+		console.log('pause')
+		return
+	}
+
+	recordingPlayPauseInputCheckbox.checked = true
+	recording.resumeRecording()
+	console.log('resume')
 })
 
 

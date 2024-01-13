@@ -26,7 +26,7 @@ callInputCheckbox.checked = false
 
 
 export const toggleCallStyle = (isCalled = false) => {
-	callInputCheckbox.checked = isCalled
+	// callInputCheckbox.checked = isCalled
 }
 
 
@@ -59,11 +59,11 @@ export const showIncommingCallDialog = (callType, acceptCallHandler, rejectCallH
 
 	acceptCallButton.addEventListener('click', (evt) => {
 		closeIncommingCallDialog()
-		acceptCallHandler(evt)
+		acceptCallHandler(callType)
 	})
 	rejectCallButton.addEventListener('click', (evt) => {
 		closeIncommingCallDialog()
-		rejectCallHandler(evt)
+		rejectCallHandler(callType)
 	})
 }
 export const closeIncommingCallDialog = () => {

@@ -23,6 +23,7 @@ export const registerSocketEvents = (socket) => {
 		socket.on('pre-offer-answer', (data) => {
 			if(!data.calleeSocketId) return console.log('server must have to send calleeSocketId')
 			webRTCHandler.handlePreOfferAnswer(data)
+		// console.log(data)
 		})
 
 		// Step-6: WebRTC-step-2: caller get offer

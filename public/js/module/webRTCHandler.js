@@ -136,6 +136,7 @@ export const sendPreOffer = ({ callType, calleePersonalCode }) => {
 		wss.sendPreOffer({ callType, calleePersonalCode })
 		ui.showOutgoingCallDialog(rejectCallerCallHandler)
 	}
+
 }
 
 export const rejectCallerCallHandler = () => {
@@ -159,37 +160,41 @@ export const handlePreOffer = ({ callType, callerSocketId }) => {
 	}
 }
 
-const acceptCallHandler = (evt) => {
+const acceptCallHandler = (callType) => {
 	createPeerConnection() 	// create peerConnection when callee accept call
 
 	const preOfferAnswer = constants.preOfferAnswer.CALL_ACCEPTED
-	sendPreOfferAnswer(preOfferAnswer)
+	sendPreOfferAnswer({ callType, preOfferAnswer })
 	ui.toggleCallStyle(true) // self side
 }
-export const rejectCallHandler = (evt) => {
+export const rejectCallHandler = (callType) => {
 	const preOfferAnswer = constants.preOfferAnswer.CALL_REJECTED
-	sendPreOfferAnswer(preOfferAnswer)
+	sendPreOfferAnswer({ callType, preOfferAnswer })
 }
 
 // Step-3: Callee send SDP answer back to caller
 /* When callee get caller's offer the store callers socket.id into a variable by Step-2. 
 		now send that id back with answer
 */ 
-export const sendPreOfferAnswer = (preOfferAnswer) => {
+export const sendPreOfferAnswer = ({ callType, preOfferAnswer }) => {
 	if(!connectedUserDetails) return
 	
 	const data = {
 		callerSocketId: connectedUserDetails.socketId,
-		preOfferAnswer
+		preOfferAnswer,
+		callType
 	}
 
 	wss.sendPreOfferAnswer(data)
 	home.lockLeftPanel()
+
+	const isAudioCall = callType === constants.callType.PERSONAL_CHAT_CODE
+	home.isAudioCall(isAudioCall) 	// show call panel
 }
 
 
 // Step-4: Caller Get SDP answer back from callee
-export const handlePreOfferAnswer = ({ calleeSocketId, preOfferAnswer }) => {
+export const handlePreOfferAnswer = ({ calleeSocketId, callType, preOfferAnswer }) => {
 	const { 
 		CALLEE_NOT_FOUND, 
 		CALL_UNAVAILABLE,
@@ -228,6 +233,8 @@ export const handlePreOfferAnswer = ({ calleeSocketId, preOfferAnswer }) => {
 		createPeerConnection() 	// create peerConnection when caller get call accepted response back
 		sendWebRTCOffer() 			// WebRTC Step-1:
 
+		const isAudioCall = callType === constants.callType.PERSONAL_CHAT_CODE
+		home.isAudioCall(isAudioCall) 	// show call panel
 	}
 
 	if(preOfferAnswer === CALL_CLOSED) {
@@ -273,6 +280,9 @@ export const handleWebRTCOffer = async ({ offer }) => { 			// { connectedUserSoc
 		answer
 	}
 	wss.sendDataUsingWebRTCSignaling(data)
+
+	// console.log(offer)
+	// home.isAudioCall(false) 	// show call panel
 }
 
 // caller-side again
@@ -282,6 +292,8 @@ export const handleWebRTCAnswer = async ({ answer }) => { 				// { connectedUser
 	
 	await peerConnection.setRemoteDescription( answer )
 	// offer and answer transation complite, so icecandidate event should fire in peerConnection
+
+	// home.isAudioCall(false) 	// show call panel
 }
 
 

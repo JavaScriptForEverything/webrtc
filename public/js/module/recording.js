@@ -1,4 +1,4 @@
-import * as store from './store'
+import * as store from './store.js'
 
 let mediaRecorder = null
 let recordedChunks = []

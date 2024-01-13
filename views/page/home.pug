@@ -85,7 +85,7 @@ block script
 					video(name='local-video' src="/videos/video2.mp4" muted=true class='absolute aspect-video h-20 top-0 border border-slate-300 ') 
 
 					input(type='checkbox' id='call-button' class='peer/call' hidden)
-					div(name='recording-controller' class='hidden peer-checked/call:flex absolute right-3 top-3 bg-slate-700/60 text-slate-50 px-3 py-1.5 rounded-md gap-2 items-center')
+					div(name='recording-panel' class='hidden peer-checked/call:flex absolute right-3 top-3 bg-slate-700/60 text-slate-50 px-3 py-1.5 rounded-md gap-2 items-center')
 						input(type='checkbox' id='play-pause' class='peer/play-pause hidden')
 						label(for='play-pause'
 							class='cursor-pointer '
@@ -100,8 +100,8 @@ block script
 					//- 
 						if we add .called class  in this container then other icons will be hidden
 						if we add .active class  to any child of this container then they will be red color
-					div(name='buttons-container' 
-						class='absolute bottom-4 left-0 w-full flex gap-2 justify-center items-center '
+					div(name='call-panel' 
+						class='absolute bottom-4 left-0 w-full hidden gap-2 justify-center items-center '
 						class='[&.called_.called]:hidden'
 						class='[&_.active]:bg-red-500 [&_.active]:scale-125 [&_.active:active]:bg-red-600 '
 						class='peer-checked/call:[&>*:not(.active)]:hidden'
