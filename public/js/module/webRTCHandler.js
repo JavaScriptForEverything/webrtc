@@ -28,6 +28,7 @@ export const getLocalPreview = async () => {
 	try {
 		const stream = await navigator.mediaDevices.getUserMedia(defaultConstrain)
 		store.setLocalStream( stream )
+		store.setCallState(constants.callState.CALL_AVAILABLE)
 		ui.updateLocalStream( stream )
 		ui.toggleVideoCallButton(true)
 
@@ -124,9 +125,18 @@ export const sendPreOffer = ({ callType, calleePersonalCode }) => {
 		callType
 	}
 
+	if(store.getState().callState === constants.callState.CALL_UNAVAILABLE) {
+		return wss.sendPreOffer({ 
+			callType: constants.preOfferAnswer.CALL_UNAVAILABLE, 
+			calleePersonalCode 
+		})
+	}
+	store.setCallState( constants.callState.CALL_UNAVAILABLE)
+
 	if( callType === constants.callType.PERSONAL_CHAT_CODE ||  callType === constants.callType.PERSONAL_VIDEO_CODE ) {
 		wss.sendPreOffer({ callType, calleePersonalCode })
 		ui.showOutgoingCallDialog(rejectCallerCallHandler)
+
 	}
 
 }
@@ -147,9 +157,15 @@ export const handlePreOffer = ({ callType, callerSocketId }) => {
 		callType
 	}
 
-	// if(false) {
-	// 	// handle call not available
+	// if( !checkCallStatePosibility(callType) ) {
+	// 	sendPreOfferAnswer({ callType, preOfferAnswer: constants.preOfferAnswer.CALL_UNAVAILABLE })
+	// 	return
 	// }
+	if( store.getState().callState ===  constants.callState.CALL_UNAVAILABLE ) {
+		sendPreOfferAnswer({ callType, preOfferAnswer: constants.preOfferAnswer.CALL_UNAVAILABLE })
+		return
+	}
+	store.setCallState(constants.callState.CALL_UNAVAILABLE)
 
 	if( callType === constants.callType.PERSONAL_CHAT_CODE ||  callType === constants.callType.PERSONAL_VIDEO_CODE ) {
 		ui.showIncommingCallDialog(callType, acceptCallHandler, rejectCallHandler)
@@ -161,11 +177,12 @@ const acceptCallHandler = (callType) => {
 
 	const preOfferAnswer = constants.preOfferAnswer.CALL_ACCEPTED
 	sendPreOfferAnswer({ callType, preOfferAnswer })
-	ui.toggleCallStyle(true) // self side
 }
 export const rejectCallHandler = (callType) => {
 	const preOfferAnswer = constants.preOfferAnswer.CALL_REJECTED
 	sendPreOfferAnswer({ callType, preOfferAnswer })
+	setInitialCallState()
+	home.hideCallPanel()
 }
 
 // Step-3: Callee send SDP answer back to caller
@@ -202,18 +219,25 @@ export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 	if(preOfferAnswer === CALLEE_NOT_FOUND) {
 		ui.closeOutgoingCallDialog()
 		ui.showErrorCallDialog({ title: 'not found', message: 'callee not found' })
+		setInitialCallState()
 	}
 	if(preOfferAnswer === CALL_UNAVAILABLE) {
 		ui.closeOutgoingCallDialog()
 		ui.showErrorCallDialog({ title: 'unavailable', message: 'callee busy with another call' })
+		setInitialCallState()
 	}
 
 	if(preOfferAnswer === CALL_REJECTED) {
 		ui.closeOutgoingCallDialog()
 		ui.showErrorCallDialog({ title: 'rejected', message: 'your call rejected' })
+		setInitialCallState()
 	}
 
 	if(preOfferAnswer === CALL_ACCEPTED) {
+
+		console.log({ callState: store.getState().callState })
+
+
 		// Step-1: Close dialog
 		ui.closeOutgoingCallDialog()
 
@@ -231,12 +255,15 @@ export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 
 		const isAudioCall = callType === constants.callType.PERSONAL_CHAT_CODE
 		home.isAudioCall(isAudioCall) 	// show call panel
+
+		store.setCallState(constants.callState.CALL_UNAVAILABLE)
 	}
 
 	if(preOfferAnswer === CALL_CLOSED) {
 		ui.closeOutgoingCallDialog() 		// Step-1: 
 		ui.toggleCallStyle(false) 			// Step-2: other's side if success
 		home.unlockLeftPanel() 					// Step-3: 
+		setInitialCallState() 					// if called available then set callState for only chat or for both
 	}
 
 }
@@ -245,16 +272,20 @@ export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 const sendWebRTCOffer = async () => {
 	if(!peerConnection) return console.log('peerConnection is empty')	
 
-	const offer = await peerConnection.createOffer()
-	await peerConnection.setLocalDescription(offer)
+	try {
+		const offer = await peerConnection.createOffer()
+		await peerConnection.setLocalDescription(offer)
 
-	const data = {
-		connectedUserSocketId: connectedUserDetails.socketId, 	// backend check is user available or not
-		type: constants.webRTCSignaling.OFFER, 									// check event type and handle data based on it
-		offer
+		const data = {
+			connectedUserSocketId: connectedUserDetails.socketId, 	// backend check is user available or not
+			type: constants.webRTCSignaling.OFFER, 									// check event type and handle data based on it
+			offer
+		}
+		wss.sendDataUsingWebRTCSignaling(data)
+
+	} catch (error) {
+		console.log('sendWebRTCOffer: ', error)		
 	}
-
-	wss.sendDataUsingWebRTCSignaling(data)
 }
 
 
@@ -263,22 +294,24 @@ export const handleWebRTCOffer = async ({ offer }) => { 			// { connectedUserSoc
 	if(!peerConnection) return console.log('peerConnection is empty')	
 	if(!offer) return console.log('can not sent answer because did not get offer')	
 
-	// make sure add offer before create answer else throw Error: => Cannot create answer in stable
-	await peerConnection.setRemoteDescription(offer)
+	try {
+		// make sure add offer before create answer else throw Error: => Cannot create answer in stable
+		await peerConnection.setRemoteDescription(offer)
 
-	const answer = await peerConnection.createAnswer()
-	await peerConnection.setLocalDescription(answer)
+		const answer = await peerConnection.createAnswer()
+		await peerConnection.setLocalDescription(answer)
 
 
-	const data = {
-		connectedUserSocketId: connectedUserDetails.socketId, 	// backend check is user available or not
-		type: constants.webRTCSignaling.ANSWER, 								// check event type and handle data based on it
-		answer
+		const data = {
+			connectedUserSocketId: connectedUserDetails.socketId, 	// backend check is user available or not
+			type: constants.webRTCSignaling.ANSWER, 								// check event type and handle data based on it
+			answer
+		}
+		wss.sendDataUsingWebRTCSignaling(data)
+
+	} catch (error) {
+		console.log('handleWebRTCOffer: ', error)
 	}
-	wss.sendDataUsingWebRTCSignaling(data)
-
-	// console.log(offer)
-	// home.isAudioCall(false) 	// show call panel
 }
 
 // caller-side again
@@ -286,10 +319,12 @@ export const handleWebRTCAnswer = async ({ answer }) => { 				// { connectedUser
 	if(!peerConnection) return console.log('peerConnection is empty')	
 	if(!answer) return console.log('ice candidate not fire because did not get answer back')	
 	
-	await peerConnection.setRemoteDescription( answer )
-	// offer and answer transation complite, so icecandidate event should fire in peerConnection
-
-	// home.isAudioCall(false) 	// show call panel
+	try {
+		await peerConnection.setRemoteDescription( answer )
+		
+	} catch (error) {
+		console.log('handleWebRTCAnswer: ', error)		
+	}
 }
 
 
@@ -297,43 +332,52 @@ export const handleWebRTCIceCandidate = async ({ candidate }) => {
 	if(!peerConnection) return console.log('peerConnection is empty')	
 	if(!candidate) return console.log('no ice candidate came back')	
 
-	await peerConnection.addIceCandidate(candidate)
+	try {
+		await peerConnection.addIceCandidate(candidate)
+
+	} catch (error) {
+		console.log('handleWebRTCIceCandidate: ', error)
+	}
 }
 
 
 
 export const switchBetweenCameraAndScreenSharing = async (screenSharingActive) => {
+	try {
+		
+		if(screenSharingActive) {
+			const { localStream } = store.getState()
+			const localStreamTrack = localStream.getVideoTracks()[0]
 
-	if(screenSharingActive) {
-		const { localStream } = store.getState()
-		const localStreamTrack = localStream.getVideoTracks()[0]
+			const senders = peerConnection.getSenders()
+			const sender = senders.find(sender => sender.track.kind === localStreamTrack.kind)
+			if(!sender) return console.log('localStreamTrack not found')
 
-		const senders = peerConnection.getSenders()
-		const sender = senders.find(sender => sender.track.kind === localStreamTrack.kind)
-		if(!sender) return console.log('localStreamTrack not found')
+			ui.updateLocalStream( localStream ) 		// update scream in self camera
+			sender.replaceTrack(localStreamTrack) 	// change stream track in other peer side
+			store.getState().screenSharingStream.getTracks().forEach( track => track.stop() ) 	// Stop streaming
+			store.setScreenSharingActive(!screenSharingActive)
+			home.toggleScreenSharingStyle(false)
 
-		ui.updateLocalStream( localStream ) 		// update scream in self camera
-		sender.replaceTrack(localStreamTrack) 	// change stream track in other peer side
-		store.getState().screenSharingStream.getTracks().forEach( track => track.stop() ) 	// Stop streaming
-		store.setScreenSharingActive(!screenSharingActive)
-		home.toggleScreenSharingStyle(false)
+			// 
+		} else {
+			const screenSharingStream = await navigator.mediaDevices.getDisplayMedia({ video: true })
+			const screenSharingVideoTrack = screenSharingStream.getVideoTracks()[0]
 
-		// 
-	} else {
-		const screenSharingStream = await navigator.mediaDevices.getDisplayMedia({ video: true })
-		const screenSharingVideoTrack = screenSharingStream.getVideoTracks()[0]
+			const senders = peerConnection.getSenders()
+			const sender = senders.find( sender => sender.track.kind == screenSharingVideoTrack.kind)
+			if(!sender) return console.log('screenSharingSender not found')
+			sender.replaceTrack(screenSharingVideoTrack)
 
-		const senders = peerConnection.getSenders()
-		const sender = senders.find( sender => sender.track.kind == screenSharingVideoTrack.kind)
-		if(!sender) return console.log('screenSharingSender not found')
-		sender.replaceTrack(screenSharingVideoTrack)
-
-		store.setScreenSharingStream( screenSharingStream )
-		store.setScreenSharingActive(!screenSharingActive)
-		ui.updateLocalStream( screenSharingStream )
-		home.toggleScreenSharingStyle(true)
-	}
+			store.setScreenSharingStream( screenSharingStream )
+			store.setScreenSharingActive(!screenSharingActive)
+			ui.updateLocalStream( screenSharingStream )
+			home.toggleScreenSharingStyle(true)
+		}
 	
+	} catch (error) {
+		console.log('switchBetweenCameraAndScreenSharing: ', error)	
+	}
 }
 
 // datachannel: Step-3: send data via data channel as string
@@ -378,15 +422,30 @@ const closePeerConnectionAndResetState = () => {
 
 	localStream.getTracks().forEach(track => track.enabled = true)
 
-
+	setInitialCallState() 					// Reset callState after call finished
 }
-	// const senders = peerConnection.getSenders()
-	// const sender = senders.find( sender => sender.track.kind === localStreamTrack.kind )
-	// if(!sender) return console.log('sender not found for closingCall')
-	// console.log(sender)
 
-	// const stream = new MediaStream()
-	// remoteStream.getTracks().forEach( track => track.stop() )
-	// store.setRemoteStream(null)
-	// ui.updateRemoteStream(stream)
+const checkCallStatePosibility = (callType) => {
+	const { callState } = store.getState()
+	const { PERSONAL_VIDEO_CODE, STRANGER_VIDEO_CODE, ONLY_CHAT_CALL_AVAILABLE } = constants.callType
+	
+	if(callState === constants.callState.CALL_AVAILABLE) return true
+	if(callState === ONLY_CHAT_CALL_AVAILABLE && callType === ONLY_CHAT_CALL_AVAILABLE) return true
 
+	// if(
+	// 		(callType === PERSONAL_VIDEO_CODE || callType === STRANGER_VIDEO_CODE) && 
+	// 		(callState === ONLY_CHAT_CALL_AVAILABLE )
+	// ) return false 
+	
+	return false
+}
+
+
+
+const setInitialCallState = () => {
+	const { localStream } = store.getState()
+	const { CALL_AVAILABLE, ONLY_CHAT_CALL_AVAILABLE } = constants.callState
+
+	const callState = localStream ? CALL_AVAILABLE : ONLY_CHAT_CALL_AVAILABLE
+	store.setCallState( callState )
+}
