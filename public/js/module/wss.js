@@ -34,6 +34,10 @@ export const registerSocketEvents = (socket) => {
 				case constants.webRTCSignaling.ICE_CANDIDATE: return webRTCHandler.handleWebRTCIceCandidate( data )
 			}
 		})
+
+		socket.on('webrtc-close-connection', (data) => {
+			webRTCHandler.handleClosingCall(data)
+		})
 	})
 }
 
@@ -55,3 +59,10 @@ export const sendPreOfferAnswer = (data) => {
 export const sendDataUsingWebRTCSignaling = (data) => {
 	socketIo.emit('webrtc-signaling', data)
 }
+
+
+export const sendClosingCallSignal = (data) => {
+	socketIo.emit('webrtc-close-connection', data)
+}
+
+

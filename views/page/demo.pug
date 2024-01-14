@@ -12,5 +12,28 @@ block body
 	//- 	video(src="/videos/video.mp4" autoplay controls class='w-40 border border-red') 
 	//- 	video(src="/videos/video.mp4" autoplay controls class='w-40 border border-orange') 
 
-	//- video(autoplay=true controls) 
-	//- 	source(src="/videos/video.mp4")
+	video(src="/videos/video.mp4" poster='/images/logo.png')
+	
+	button(name='play' class='px-2 py-1 rounded border border-blue-500') Play
+	button(name='pause' class='px-2 py-1 rounded border border-blue-500') Pause
+	button(name='stop' class='px-2 py-1 rounded border border-blue-500') Stop
+
+	script.
+		const $ = (selector) => document.querySelector(selector)
+
+		const video = $('video')
+		const playButton = $('[name=play]')
+		const pauseButton = $('[name=pause]')
+		const stopButton = $('[name=stop]')
+
+		playButton.addEventListener('click', () => {
+			video.play()
+		})
+		pauseButton.addEventListener('click', () => {
+			video.pause()
+		})
+		stopButton.addEventListener('click', () => {
+			//- video.pause()
+			//- video.currentTime = 0
+			video.load()
+		})

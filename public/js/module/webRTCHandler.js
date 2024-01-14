@@ -29,21 +29,13 @@ export const getLocalPreview = async () => {
 		const stream = await navigator.mediaDevices.getUserMedia(defaultConstrain)
 		store.setLocalStream( stream )
 		ui.updateLocalStream( stream )
+		ui.toggleVideoCallButton(true)
 
 	} catch (error) {
-		console.log('getUserMedia Error: ', error.message)	
+		console.log('getUserMedia Error: ', error.message, error)	
 	}
 }
 
-// export const getLocalPreview = () => {
-// 	navigator.mediaDevices.getUserMedia(options)
-// 	.then(stream => {
-// 		store.setLocalStream( stream )
-// 		ui.updateLocalStream( stream )
-// 	}).catch(error => {
-// 		console.log('getUserMedia Error: ', error.message)	
-// 	})
-// }
 
 
 /* must be called in both side: caller-side and callee side before sending and receiving sdp offer.
@@ -106,7 +98,7 @@ const createPeerConnection = () => {
 		// datachannel: Step-4: listen to dataChannel connection === io.on('connect)
 		channel.addEventListener('open', () => {
 			// console.log('data channel created')
-			home.enableMessagePanel()
+			home.enableMessagePanel(true)
 
 			channel.addEventListener('message', (evt) => {
 				const message = JSON.parse(evt.data)
@@ -155,6 +147,10 @@ export const handlePreOffer = ({ callType, callerSocketId }) => {
 		callType
 	}
 
+	// if(false) {
+	// 	// handle call not available
+	// }
+
 	if( callType === constants.callType.PERSONAL_CHAT_CODE ||  callType === constants.callType.PERSONAL_VIDEO_CODE ) {
 		ui.showIncommingCallDialog(callType, acceptCallHandler, rejectCallHandler)
 	}
@@ -194,7 +190,7 @@ export const sendPreOfferAnswer = ({ callType, preOfferAnswer }) => {
 
 
 // Step-4: Caller Get SDP answer back from callee
-export const handlePreOfferAnswer = ({ calleeSocketId, callType, preOfferAnswer }) => {
+export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 	const { 
 		CALLEE_NOT_FOUND, 
 		CALL_UNAVAILABLE,
@@ -347,21 +343,50 @@ export const sendMessageUsingDataChannel = (message) => {
 }
 
 
-export const closingCall = () => {
+// caller-side
+export const sendClosingCall = () => {
+	const data = {
+		connectedUserSocketId: connectedUserDetails.socketId,
+	}
+	wss.sendClosingCallSignal(data)
+	closePeerConnectionAndResetState() 	// close from caller-side
+
+	// Step-3: Update UI: caller-side
+	ui.updateUIAfterCallClose()
+	connectedUserDetails = null
+}
+
+// callee-side
+export const handleClosingCall = (data) => {
+	closePeerConnectionAndResetState() 	// close from callee-side
+
+	// Step-3: Update UI: caller-side
+	ui.updateUIAfterCallClose()
+	connectedUserDetails = null
+}
+
+const closePeerConnectionAndResetState = () => {
+	if(!peerConnection) return
+
+	// Step-1: close connection
+	peerConnection.close() 					// Close connection
+	peerConnection = null 					// reset connection variable
+
+	// Step-2: reset microphone or camera: if user manually does that during chating time
 	const { localStream } = store.getState()
 	if(!localStream) return
 
-	const localStreamTrack = localStream.getTracks()[0]
+	localStream.getTracks().forEach(track => track.enabled = true)
 
-	const senders = peerConnection.getSenders()
-	const sender = senders.find( sender => sender.track.kind === localStreamTrack.kind )
-	if(!sender) return console.log('sender not found for closingCall')
-	console.log(sender)
+
+}
+	// const senders = peerConnection.getSenders()
+	// const sender = senders.find( sender => sender.track.kind === localStreamTrack.kind )
+	// if(!sender) return console.log('sender not found for closingCall')
+	// console.log(sender)
 
 	// const stream = new MediaStream()
 	// remoteStream.getTracks().forEach( track => track.stop() )
 	// store.setRemoteStream(null)
 	// ui.updateRemoteStream(stream)
-}
-
 

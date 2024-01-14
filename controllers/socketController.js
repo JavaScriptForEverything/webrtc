@@ -51,6 +51,14 @@ module.exports = (io) => (socket) => {
 		io.to(data.connectedUserSocketId).emit('webrtc-signaling', data)
 	})
 
+	socket.on('webrtc-close-connection', (data) => {
+		const connectedPeer = connectedPeers.find( peerSocketId => peerSocketId === data.connectedUserSocketId)
+		if(!connectedPeer) return console.log('WebRTC: webrtc-close-connection failed. missing { connectedUserSocketId }')
+
+		io.to(data.connectedUserSocketId).emit('webrtc-close-connection', data)
+
+	})
+
 	socket.on('disconnect', () => {
 		connectedPeers = connectedPeers.filter(socketId => socket.id !== socketId)
 		console.log(connectedPeers)

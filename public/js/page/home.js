@@ -7,6 +7,11 @@ import * as ui from '../module/ui.js'
 import * as elements from '../module/elements.js'
 import * as recording from '../module/recording.js'
 
+/* only handle eventhandler in this page, don't try to update UI here
+		- Because this file run only after every files loaded, that means
+			it override others code if tie, so use ui.js to update UI.
+*/
+
 const socket = io('/')
 wss.registerSocketEvents(socket) 	// Handling all WebSocket events in wss.js file
 
@@ -60,9 +65,14 @@ export const unlockLeftPanel = () => {
 	leftPanel.classList.remove('active') 	// unloack panel in caller side
 }
 
-export const enableMessagePanel = () => {
-	sendMessageContainer.style.pointerEvents = 'auto'
+export const clearMessageContainer = () => {
+	messageContainer.innerHTML = ''
 }
+export const enableMessagePanel = (isLock = true) => {
+	// sendMessageContainer.style.pointerEvents = 'auto'
+	sendMessageContainer.style.pointerEvents = !isLock ? 'none' : 'auto'
+}
+
 export const addYourMessage = (message) => {
 	elements.createYourMessage(messageContainer, message)
 }
@@ -74,15 +84,26 @@ export const toggleScreenSharingStyle = (checked=false) => {
 	screenSharingInputCheckbox.checked = checked
 }
 
-
-
+const showRecordingPanel = () => {
+	recordingInputCheckbox.checked = true
+	recordingPanel.style.display = 'flex'
+}
+const hideRecordingPanel = () => {
+	recordingInputCheckbox.checked = false
+	recordingPanel.style.display = 'none'
+}
 
 export const isAudioCall = (isAudio = true) => {
 	callPanel.style.display = 'flex'
 	callPanel.classList.toggle('called', isAudio)
 }
+export const hideCallPanel = () => {
+	callPanel.style.display = 'none'
+	callPanel.classList.toggle('called', true)
+}
 
-// isAudioCall(false)
+
+
 
 
 
@@ -138,17 +159,6 @@ allowFromStrangerInput.addEventListener('change', (evt) => {
 
 
 
-const closeCallHandler = () => {
-	// Step-1: stop call from caller side
-	ui.toggleCallStyle(false) 				
-
-	// Step-2: stop call from callee side
-	const preOfferAnswer = constants.preOfferAnswer.CALL_CLOSED
-	webRTCHandler.sendPreOfferAnswer(preOfferAnswer) 	
-
-	// Step-3: remove click block 
-	unlockLeftPanel()
-}
 
 microphoneIcon.addEventListener('click', (evt) => {
 	evt.preventDefault()
@@ -170,11 +180,14 @@ cameraIcon.addEventListener('click', (evt) => {
 	})
 })
 
-callIcon.addEventListener('click', (evt) => {
+
+const closeCallHandler = (evt) => {
 	evt.preventDefault()
-	
-	webRTCHandler.closingCall()
-})
+
+	webRTCHandler.sendClosingCall()
+}
+callIcon.addEventListener('click', closeCallHandler)
+
 
 screenSharingIcon.addEventListener('click', (evt) => {
 	evt.preventDefault()
@@ -182,16 +195,6 @@ screenSharingIcon.addEventListener('click', (evt) => {
 	const { screenSharingActive } = store.getState()
 	webRTCHandler.switchBetweenCameraAndScreenSharing( screenSharingActive )
 })
-
-const showRecordingPanel = () => {
-	recordingInputCheckbox.checked = true
-	recordingPanel.style.display = 'flex'
-}
-const hideRecordingPanel = () => {
-	recordingInputCheckbox.checked = false
-	recordingPanel.style.display = 'none'
-}
-
 
 recordingIcon.addEventListener('click', (evt) => {
 	evt.preventDefault()
@@ -207,8 +210,10 @@ recordingIcon.addEventListener('click', (evt) => {
 })
 stopRecordingButton.addEventListener('click', (evt) => {
 	evt.preventDefault()
+
 	hideRecordingPanel()
 	recording.stopRecording()
+	closeCallHandler(evt)
 })
 
 recordingPayPauseButton.addEventListener('click', (evt) => {

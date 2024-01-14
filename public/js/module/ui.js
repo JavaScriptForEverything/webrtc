@@ -1,8 +1,16 @@
-import { $, encodeHTML } from './utils.js'
+import { $ } from './utils.js'
 import * as constants from './constants.js'
-import * as elements from './elements.js'
+import * as home from '../page/home.js'
+import * as store from './store.js'
 
-/* How this page loaded or executed ?
+
+/* Don't modify ui in home.js instead use ui.js
+		- Because home.js runs after all scripts because we attach as <script defer ...>
+			which run after every files. that means it has HIGHER PRIORITY than others.
+
+			so modify UI in ui.js file instead of home.js file or write code carefully which code overriden by home.js
+
+ 	How this page loaded or executed ?
 		- We import 
 				home.pug 	=>  home.js
 				wss.js 		=>  home.js
@@ -16,13 +24,22 @@ const incommingCallingDialog = $('[name=incomming-call-dialog]')
 const outgoingCallDialog = $('[name=outgoing-call-dialog]')
 const errorCallDialog = $('[name=error-call-dialog]')
 
+const personalVideoCallButton = $('[name=personal-video-call-button]')
+const strangerVideoCallButton = $('[name=stranger-video-call-button]')
 const callInputCheckbox = $('#call-button')
+const remoteVideo = $('video[name=remote-video]')
 
 
 
 callInputCheckbox.checked = false
 
+personalVideoCallButton.disabled = true
+strangerVideoCallButton.disabled = true
 
+export const toggleVideoCallButton = (isEnabled = false) => {
+	personalVideoCallButton.disabled = !isEnabled
+strangerVideoCallButton.disabled = !isEnabled
+}
 
 
 export const toggleCallStyle = (isCalled = false) => {
@@ -132,4 +149,13 @@ export const updateRemoteStream = (stream) => {
 
 
 
+export const updateUIAfterCallClose = () => {
+	home.hideCallPanel()
+	home.unlockLeftPanel()
+	home.enableMessagePanel(false)
+	home.clearMessageContainer()
+
+	store.setRemoteStream(null)
+	remoteVideo.srcObject=null 	// reset video to it's initial state
+}
 
