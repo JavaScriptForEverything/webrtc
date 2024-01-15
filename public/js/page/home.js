@@ -3,7 +3,6 @@ import * as wss from '../module/wss.js'
 import * as store from '../module/store.js'
 import * as webRTCHandler from '../module/webRTCHandler.js'
 import * as constants from '../module/constants.js'
-import * as ui from '../module/ui.js'
 import * as elements from '../module/elements.js'
 import * as recording from '../module/recording.js'
 
@@ -45,16 +44,14 @@ const messageContainer = $('[name=message-container]')
 const sendMessageContainer = $('[name=send-message-container]')
 const sendMessageInput = $('input[name=send-message-input]')
 const sendMessageButton = $('button[name=send-message-button]')
-
+const leftPanelToggleInput = $('#toggle-left-panel')
 
 // Reset to default
+leftPanelToggleInput.checked = true
 personalCodeInput.value = ''
 microphoneInputCheckbox.checked = false 	
 cameraInputCheckbox.checked = false
 recordingInputCheckbox.checked = false
-
-
-
 
 
 
@@ -67,6 +64,7 @@ export const unlockLeftPanel = () => {
 
 export const clearMessageContainer = () => {
 	messageContainer.innerHTML = ''
+
 }
 export const enableMessagePanel = (isLock = true) => {
 	// sendMessageContainer.style.pointerEvents = 'auto'
