@@ -120,11 +120,6 @@ const createPeerConnection = () => {
 export const sendPreOffer = ({ callType, calleePersonalCode }) => {
 	if(!calleePersonalCode) return console.log('calleePersonalCode is missing')
 
-	connectedUserDetails = {
-		socketId: calleePersonalCode,
-		callType
-	}
-
 	if(store.getState().callState === constants.callState.CALL_UNAVAILABLE) {
 		return wss.sendPreOffer({ 
 			callType: constants.preOfferAnswer.CALL_UNAVAILABLE, 
@@ -133,16 +128,25 @@ export const sendPreOffer = ({ callType, calleePersonalCode }) => {
 	}
 	store.setCallState( constants.callState.CALL_UNAVAILABLE)
 
+	/* update after sending error state: else on error return empty and userDetails will be empty
+		 which throw error */
+	connectedUserDetails = { 					
+		socketId: calleePersonalCode,
+		callType
+	}
+
 	if( callType === constants.callType.PERSONAL_CHAT_CODE ||  callType === constants.callType.PERSONAL_VIDEO_CODE ) {
 		wss.sendPreOffer({ callType, calleePersonalCode })
-		ui.showOutgoingCallDialog(rejectCallerCallHandler)
+		ui.showOutgoingCallDialog(callType, rejectCallerCallHandler)
 
 	}
 
 }
 
-export const rejectCallerCallHandler = () => {
+// caller side rejected handler
+export const rejectCallerCallHandler = (callType) => {
 	ui.toggleCallStyle(false) // self side if rejected
+	sendPreOfferAnswer({ callType, preOfferAnswer: constants.preOfferAnswer.CALL_REJECTED })
 }
 
 
@@ -151,11 +155,6 @@ export const rejectCallerCallHandler = () => {
 // Step-2: Callee Get SDP offer of caller via websocket server
 export const handlePreOffer = ({ callType, callerSocketId }) => {
 	if(!callerSocketId) return console.log('callerSocketId is missing')
-
-	connectedUserDetails = {
-		socketId: callerSocketId,
-		callType
-	}
 
 	// if( !checkCallStatePosibility(callType) ) {
 	// 	sendPreOfferAnswer({ callType, preOfferAnswer: constants.preOfferAnswer.CALL_UNAVAILABLE })
@@ -166,6 +165,11 @@ export const handlePreOffer = ({ callType, callerSocketId }) => {
 		return
 	}
 	store.setCallState(constants.callState.CALL_UNAVAILABLE)
+
+	connectedUserDetails = {
+		socketId: callerSocketId,
+		callType
+	}
 
 	if( callType === constants.callType.PERSONAL_CHAT_CODE ||  callType === constants.callType.PERSONAL_VIDEO_CODE ) {
 		ui.showIncommingCallDialog(callType, acceptCallHandler, rejectCallHandler)
@@ -199,7 +203,7 @@ export const sendPreOfferAnswer = ({ callType, preOfferAnswer }) => {
 	}
 
 	wss.sendPreOfferAnswer(data)
-	home.lockLeftPanel()
+	// home.lockLeftPanel()
 
 	const isAudioCall = callType === constants.callType.PERSONAL_CHAT_CODE
 	home.isAudioCall(isAudioCall) 	// show call panel
@@ -220,28 +224,26 @@ export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 		ui.closeOutgoingCallDialog()
 		ui.showErrorCallDialog({ title: 'not found', message: 'callee not found' })
 		setInitialCallState()
+		home.unlockLeftPanel() 					// Step-3: 
 	}
 	if(preOfferAnswer === CALL_UNAVAILABLE) {
 		ui.closeOutgoingCallDialog()
 		ui.showErrorCallDialog({ title: 'unavailable', message: 'callee busy with another call' })
 		setInitialCallState()
+		home.unlockLeftPanel() 					// Step-3: 
 	}
 
 	if(preOfferAnswer === CALL_REJECTED) {
 		ui.closeOutgoingCallDialog()
+		ui.closeIncommingCallDialog()
 		ui.showErrorCallDialog({ title: 'rejected', message: 'your call rejected' })
 		setInitialCallState()
+		home.unlockLeftPanel() 					// Step-3: 
 	}
 
 	if(preOfferAnswer === CALL_ACCEPTED) {
-
-		console.log({ callState: store.getState().callState })
-
-
 		// Step-1: Close dialog
 		ui.closeOutgoingCallDialog()
-
-		// Send WebRTC details
 
 		// Step-2: apply call able style
 		ui.toggleCallStyle(true) // other's side if success

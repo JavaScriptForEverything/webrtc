@@ -88,14 +88,14 @@ export const closeIncommingCallDialog = () => {
 }
 
 // caller side
-export const showOutgoingCallDialog = (rejectCallHandler) => {
+export const showOutgoingCallDialog = (callType, rejectCallHandler) => {
 
 	const rejectCallButton = $('[name=outgoing-call-dialog] [name=call-off-button]')
 	outgoingCallDialog.style.display = 'flex'
 
-	rejectCallButton.addEventListener('click', (evt) => {
+	rejectCallButton.addEventListener('click', () => {
 		closeOutgoingCallDialog()
-		rejectCallHandler(evt)
+		rejectCallHandler(callType)
 	})
 }
 export const closeOutgoingCallDialog = () => {

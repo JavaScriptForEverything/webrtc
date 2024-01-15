@@ -48,6 +48,7 @@ const leftPanelToggleInput = $('#toggle-left-panel')
 
 // Reset to default
 leftPanelToggleInput.checked = true
+
 personalCodeInput.value = ''
 microphoneInputCheckbox.checked = false 	
 cameraInputCheckbox.checked = false
