@@ -8,7 +8,7 @@ block script
 		//- if add .active class then this entire panel will be locked
 		input(type='checkbox' id='toggle-left-panel' class='peer/toggle-left-panel' hidden)
 		div(name='left-panel' 
-			class='w-2/3 max-w-xs h-screen overflow-y-scroll bg-blue-500 text-slate-100 [&.active]:pointer-events-none '
+			class='w-2/3 max-w-xs h-screen overflow-y-auto bg-blue-500 text-slate-100 [&.active]:pointer-events-none '
 			class='absolute top-0 left-0 z-10 md:static -translate-x-full peer-checked/toggle-left-panel:translate-x-0 md:translate-x-0 transition-transform duration-300'
 			)
 			div(class='h-full w-4/5 mx-auto py-2 flex flex-col gap-2 relative')
@@ -173,7 +173,7 @@ block script
 
 		div(name='right-section' class='w-full h-1/4 md:w-72 md:h-screen border border-slate-200 bg-slate-50  ') 
 			div(class='h-full flex flex-col px-4 pt-2')
-				div(name='message-container' class='flex-1 overflow-y-scroll')
+				div(name='message-container' class='flex-1 overflow-y-auto')
 					//- div( name='their-message-container' class='flex items-start gap-2 mb-2')
 						img(src='/images/logo.png' alt='their avatar' class='w-6 h-6 rounded-full')
 						div(class='max-w-[80%] px-2 py-1 bg-slate-200 border border-slate-300 rounded-md rounded-tl-none') 

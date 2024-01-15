@@ -5,6 +5,9 @@ import * as webRTCHandler from '../module/webRTCHandler.js'
 import * as constants from '../module/constants.js'
 import * as elements from '../module/elements.js'
 import * as recording from '../module/recording.js'
+import { Snackbar } from '../module/components/index.js'
+
+
 
 /* only handle eventhandler in this page, don't try to update UI here
 		- Because this file run only after every files loaded, that means
@@ -106,14 +109,16 @@ export const hideCallPanel = () => {
 
 
 
-
 socketIdCopyButton.addEventListener('click', () => {
 	navigator.clipboard.writeText(store.getState().socketId)
 })
 
 personalChatButton.addEventListener('click', (evt) => {
 	const calleePersonalCode = personalCodeInput.value 
-	if(!calleePersonalCode) return console.log('calleePersonalCode is empty')
+	if(!calleePersonalCode) return Snackbar({
+		severity: 'error',
+		message: 'calleePersonalCode is empty'
+	})
 
 	const data = {
 		callType: constants.callType.PERSONAL_CHAT_CODE,
@@ -123,7 +128,10 @@ personalChatButton.addEventListener('click', (evt) => {
 })
 personalVideoCallButton.addEventListener('click', (evt) => {
 	const calleePersonalCode = personalCodeInput.value 
-	if(!calleePersonalCode) return console.log('calleePersonalCode is empty')
+	if(!calleePersonalCode) return Snackbar({
+		severity: 'error',
+		message: 'calleePersonalCode is empty'
+	})
 
 	const args = {
 		callType: constants.callType.PERSONAL_VIDEO_CODE,
@@ -132,28 +140,24 @@ personalVideoCallButton.addEventListener('click', (evt) => {
 	webRTCHandler.sendPreOffer(args)
 })
 strangerChatButton.addEventListener('click', (evt) => {
-	const calleePersonalCode = personalCodeInput.value 
-	if(!calleePersonalCode) return console.log('calleePersonalCode is empty')
+	Snackbar({
+		severity: 'error',
+		message: 'Not handled yet'
+	})
 
-	const args = {
-		callType: constants.callType.STRANGER_CHAT_CODE,
-		calleePersonalCode
-	}
-	webRTCHandler.sendPreOffer(args)
 })
 strangerVideoCallButton.addEventListener('click', (evt) => {
-	const calleePersonalCode = personalCodeInput.value 
-	if(!calleePersonalCode) return console.log('calleePersonalCode is empty')
-
-	const args = {
-		callType: constants.callType.STRANGER_VIDEO_CODE,
-		calleePersonalCode
-	}
-	webRTCHandler.sendPreOffer(args)
+	Snackbar({
+		severity: 'error',
+		message: 'Not handled yet'
+	})
 })
 
 allowFromStrangerInput.addEventListener('change', (evt) => {
-	console.log(evt.target.checked)
+	Snackbar({
+		severity: 'error',
+		message: 'Not handled yet'
+	})
 })
 
 

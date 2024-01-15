@@ -42,9 +42,6 @@ strangerVideoCallButton.disabled = !isEnabled
 }
 
 
-export const toggleCallStyle = (isCalled = false) => {
-	// callInputCheckbox.checked = isCalled
-}
 
 
 // export const toggleMicrophoneOnOff = (isCalled = false) => {

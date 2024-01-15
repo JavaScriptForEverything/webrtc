@@ -3,6 +3,7 @@ import * as constants from './constants.js'
 import * as ui from './ui.js'
 import * as store from './store.js'
 import * as home from '../page/home.js'
+import { Snackbar } from './components/index.js'
 
 let connectedUserDetails = null
 /* Don't be confused with caller side and callee side
@@ -33,6 +34,10 @@ export const getLocalPreview = async () => {
 		ui.toggleVideoCallButton(true)
 
 	} catch (error) {
+		Snackbar({
+			severity: 'error',
+			message: `getUserMedia Error: ${error.message}`
+		})
 		console.log('getUserMedia Error: ', error.message, error)	
 	}
 }
@@ -58,7 +63,10 @@ const createPeerConnection = () => {
 	/* Step-7: webrtc-step-3:
 			After share offer and answer between peers, we must  share ice candidate too (which is network details) */
 	peerConnection.addEventListener('icecandidate', (evt) => {
-		if(!evt.candidate) return
+		if(!evt.candidate) return Snackbar({
+			severity: 'error',
+			message: `onicecandidate event error: can't share evt.candidate`
+		})
 
 		const data = {
 			connectedUserSocketId: connectedUserDetails.socketId, 	// backend check is user available or not
@@ -118,7 +126,10 @@ const createPeerConnection = () => {
 //------------ caller side ------------------
 // Step-1: caller Send SDP offer to callee
 export const sendPreOffer = ({ callType, calleePersonalCode }) => {
-	if(!calleePersonalCode) return console.log('calleePersonalCode is missing')
+	if(!calleePersonalCode) return Snackbar({
+		severity: 'error',
+		message: `calleePersonalCode is missing`
+	})
 
 	if(store.getState().callState === constants.callState.CALL_UNAVAILABLE) {
 		return wss.sendPreOffer({ 
@@ -145,7 +156,6 @@ export const sendPreOffer = ({ callType, calleePersonalCode }) => {
 
 // caller side rejected handler
 export const rejectCallerCallHandler = (callType) => {
-	ui.toggleCallStyle(false) // self side if rejected
 	sendPreOfferAnswer({ callType, preOfferAnswer: constants.preOfferAnswer.CALL_REJECTED })
 }
 
@@ -154,7 +164,10 @@ export const rejectCallerCallHandler = (callType) => {
 //----------- callee side--------------
 // Step-2: Callee Get SDP offer of caller via websocket server
 export const handlePreOffer = ({ callType, callerSocketId }) => {
-	if(!callerSocketId) return console.log('callerSocketId is missing')
+	if(!callerSocketId) return Snackbar({
+		severity: 'error',
+		message: `callerSocketId is missing`
+	})
 
 	// if( !checkCallStatePosibility(callType) ) {
 	// 	sendPreOfferAnswer({ callType, preOfferAnswer: constants.preOfferAnswer.CALL_UNAVAILABLE })
@@ -194,7 +207,10 @@ export const rejectCallHandler = (callType) => {
 		now send that id back with answer
 */ 
 export const sendPreOfferAnswer = ({ callType, preOfferAnswer }) => {
-	if(!connectedUserDetails) return
+	if(!connectedUserDetails) return Snackbar({
+		severity: 'error',
+		message: `connectedUserDetails is empty`
+	})
 	
 	const data = {
 		callerSocketId: connectedUserDetails.socketId,
@@ -246,7 +262,6 @@ export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 		ui.closeOutgoingCallDialog()
 
 		// Step-2: apply call able style
-		ui.toggleCallStyle(true) // other's side if success
 
 		// Step-3: lock left panel: user can't click untill called ended
 		home.lockLeftPanel()
@@ -263,7 +278,6 @@ export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 
 	if(preOfferAnswer === CALL_CLOSED) {
 		ui.closeOutgoingCallDialog() 		// Step-1: 
-		ui.toggleCallStyle(false) 			// Step-2: other's side if success
 		home.unlockLeftPanel() 					// Step-3: 
 		setInitialCallState() 					// if called available then set callState for only chat or for both
 	}
@@ -272,7 +286,10 @@ export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 
 // caller-Side: Step-5
 const sendWebRTCOffer = async () => {
-	if(!peerConnection) return console.log('peerConnection is empty')	
+	if(!peerConnection) return Snackbar({
+		severity: 'error',
+		message: `peerConnection is empty`
+	})
 
 	try {
 		const offer = await peerConnection.createOffer()
@@ -287,14 +304,25 @@ const sendWebRTCOffer = async () => {
 
 	} catch (error) {
 		console.log('sendWebRTCOffer: ', error)		
+		Snackbar({
+			severity: 'error',
+			message: `sendWebRTCOffer: ${error}`
+		})
 	}
 }
 
 
 // callee-side: used in Step-6 in wss.on('webrtc-signaling')
 export const handleWebRTCOffer = async ({ offer }) => { 			// { connectedUserSocketId, type, offer }
-	if(!peerConnection) return console.log('peerConnection is empty')	
-	if(!offer) return console.log('can not sent answer because did not get offer')	
+	if(!peerConnection) return Snackbar({
+		severity: 'error',
+		message: `peerConnection is empty`
+	})
+
+	if(!offer) return Snackbar({
+		severity: 'error',
+		message: `can not sent answer because did not get offer`
+	})
 
 	try {
 		// make sure add offer before create answer else throw Error: => Cannot create answer in stable
@@ -313,19 +341,30 @@ export const handleWebRTCOffer = async ({ offer }) => { 			// { connectedUserSoc
 
 	} catch (error) {
 		console.log('handleWebRTCOffer: ', error)
+		Snackbar({
+			severity: 'error',
+			message: `handleWebRTCOffer: ${error}`
+		})
 	}
 }
 
 // caller-side again
 export const handleWebRTCAnswer = async ({ answer }) => { 				// { connectedUserSocketId, type, answer }
 	if(!peerConnection) return console.log('peerConnection is empty')	
-	if(!answer) return console.log('ice candidate not fire because did not get answer back')	
+	if(!answer) return Snackbar({
+		severity: 'error',
+		message: `ice candidate not fire because did not get answer back`
+	})
 	
 	try {
 		await peerConnection.setRemoteDescription( answer )
 		
 	} catch (error) {
 		console.log('handleWebRTCAnswer: ', error)		
+		Snackbar({
+			severity: 'error',
+			message: `handleWebRTCAnswer:  ${error}`
+		})
 	}
 }
 
@@ -339,6 +378,10 @@ export const handleWebRTCIceCandidate = async ({ candidate }) => {
 
 	} catch (error) {
 		console.log('handleWebRTCIceCandidate: ', error)
+		Snackbar({
+			severity: 'error',
+			message: `handleWebRTCIceCandidate: `
+		})
 	}
 }
 
@@ -379,6 +422,10 @@ export const switchBetweenCameraAndScreenSharing = async (screenSharingActive) =
 	
 	} catch (error) {
 		console.log('switchBetweenCameraAndScreenSharing: ', error)	
+		Snackbar({
+			severity: 'error',
+			message: `switchBetweenCameraAndScreenSharing: ${error}`
+		})
 	}
 }
 
