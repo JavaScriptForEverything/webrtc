@@ -29,6 +29,7 @@ const personalVideoCallButton = $('[name=personal-video-call-button]')
 const callInputCheckbox = $('#call-button')
 const remoteVideo = $('video[name=remote-video]')
 const leftPanelToggleInput = $('#toggle-left-panel')
+const typingIndicator = $('[name=typing-indicator]')
 
 leftPanelToggleInput.checked = true
 callInputCheckbox.checked = false
@@ -42,11 +43,19 @@ export const toggleVideoCallButton = (isEnabled = false) => {
 
 
 
+let timer = 0
+export const toggleTypingIndicator = (isVisible = false) => {
+	typingIndicator.style.display = isVisible ? 'block' : 'none'
+	clearTimeout(timer)
 
-// export const toggleMicrophoneOnOff = (isCalled = false) => {
-// 	microphoneInputCheckbox.checked = isCalled
-// }
-// toggleMicrophoneOnOff(true)
+	timer = setTimeout(() => {
+		toggleTypingIndicator(false)			// hide
+		// typingIndicator.style.display = !isVisible ? 'block' : 'none'
+	}, 3000);
+}
+// toggleTypingIndicator(true)
+
+
 
 
 

@@ -190,7 +190,10 @@ block script
 							//- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M.41 13.41L6 19l1.41-1.42L1.83 12m20.41-6.42L11.66 16.17L7.5 12l-1.43 1.41L11.66 19l12-12M18 7l-1.41-1.42l-6.35 6.35l1.42 1.41z"/></svg>
 
 
-				div(name='send-message-container' class='pointer-events-none my-4 flex justify-end items-center')
+				button(name='typing-indicator' type="button" class='hidden mt-auto px-2 text-slate-600 font-thin') 
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="4" cy="12" r="3" fill="currentColor"><animate id="svgSpinners3DotsFade0" fill="freeze" attributeName="opacity" begin="0;svgSpinners3DotsFade1.end-0.25s" dur="0.75s" values="1;.2"/></circle><circle cx="12" cy="12" r="3" fill="currentColor" opacity=".4"><animate fill="freeze" attributeName="opacity" begin="svgSpinners3DotsFade0.begin+0.15s" dur="0.75s" values="1;.2"/></circle><circle cx="20" cy="12" r="3" fill="currentColor" opacity=".3"><animate id="svgSpinners3DotsFade1" fill="freeze" attributeName="opacity" begin="svgSpinners3DotsFade0.begin+0.3s" dur="0.75s" values="1;.2"/></circle></svg>
+
+				div(name='send-message-container' class='pointer-events-none mb-4 flex justify-end items-center')
 					input(name='send-message-input' type='text' placeholder='your message ...' 
 						class='w-full relative pl-3 pr-10 py-1 rounded-md border border-slate-300 '
 						class='outline-none focus:border-slate-400'

@@ -85,6 +85,13 @@ module.exports = (io) => (socket) => {
 	})
 
 
+	socket.on('typing', ({ calleeId }) => {
+		const connectedPeer = connectedPeers.find( peerSocketId => peerSocketId === calleeId)
+		if(!connectedPeer) return console.log('typingIndicator: failed')
+
+		io.to(calleeId).emit('typing', { calleeId })
+	})
+
 
 	socket.on('disconnect', () => {
 		connectedPeers = connectedPeers.filter(socketId => socket.id !== socketId)

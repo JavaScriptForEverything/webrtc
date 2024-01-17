@@ -5,6 +5,7 @@ import * as webRTCHandler from '../module/webRTCHandler.js'
 import * as constants from '../module/constants.js'
 import * as elements from '../module/elements.js'
 import * as recording from '../module/recording.js'
+import * as ui from '../module/ui.js'
 import { Snackbar } from '../module/components/index.js'
 
 
@@ -71,7 +72,6 @@ export const clearMessageContainer = () => {
 
 }
 export const enableMessagePanel = (isLock = true) => {
-	// sendMessageContainer.style.pointerEvents = 'auto'
 	sendMessageContainer.style.pointerEvents = !isLock ? 'none' : 'auto'
 }
 
@@ -245,7 +245,10 @@ const sendMessageHandler = (message) => {
 	sendMessageInput.value = ''
 }
 sendMessageInput.addEventListener('keydown', (evt) => {
+	// enableMessagePanel(true) 				// for testing time enable
 	const message = evt.target.value
+
+	webRTCHandler.typingIndicator()
 
 	if(evt.key === 'Enter') {
 		sendMessageHandler(message)

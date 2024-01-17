@@ -39,9 +39,12 @@ export const registerSocketEvents = (socket) => {
 			webRTCHandler.handleClosingCall(data)
 		})
 
-
 		socket.on('call-state', (data) => {
 			webRTCHandler.handleCallStartSignal(data)
+		})
+
+		socket.on('typing', (data) => {
+			ui.toggleTypingIndicator(true)
 		})
 	})
 }
@@ -74,4 +77,8 @@ export const sendClosingCallSignal = (data) => {
 
 export const sendCallStartSignal = ( data ) => { 		
 	socketIo.emit('start-call',  data )
+}
+
+export const typingIndicator = ({ calleeId }) => {
+	socketIo.emit('typing', { calleeId })
 }

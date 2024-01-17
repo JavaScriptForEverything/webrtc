@@ -650,6 +650,10 @@ video {
   top: 1rem;
 }
 
+.end-0 {
+  inset-inline-end: 0px;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -727,6 +731,10 @@ video {
 
 .mt-4 {
   margin-top: 1rem;
+}
+
+.mt-auto {
+  margin-top: auto;
 }
 
 .block {
@@ -1251,6 +1259,10 @@ video {
 
 .font-semibold {
   font-weight: 600;
+}
+
+.font-thin {
+  font-weight: 100;
 }
 
 .capitalize {

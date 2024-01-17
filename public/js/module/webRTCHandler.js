@@ -118,7 +118,7 @@ const createPeerConnection = () => {
 			channel.addEventListener('message', (evt) => {
 				const message = JSON.parse(evt.data)
 				home.addTheirMessage(message)
-				// console.log(message)
+				ui.toggleTypingIndicator(false) 	// when send stop indicator immediately
 			})
 		})
 
@@ -525,4 +525,12 @@ const isCallerOrCalleeAlreadyEngaged = () => {
 	}
 
 	return false
+}
+
+
+export const typingIndicator = () => {
+	const data = {
+		calleeId: connectedUserDetails.socketId
+	}
+	wss.typingIndicator(data)
 }
