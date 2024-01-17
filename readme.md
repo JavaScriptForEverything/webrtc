@@ -16,4 +16,5 @@
 
 | Caller Side            | Callee Side            |
 | ---------------------- | ---------------------- |
-| ![caller-side](https://github.com/JavaScriptForEverything/webrtc/tree/master/public/images/project_design/09_accept-view.png) | ![callee-side](https://github.com/JavaScriptForEverything/webrtc/tree/master/public/images/project_design/10_typing_message.png) |
+| ![caller-side](https://github.com/JavaScriptForEverything/webrtc/blob/master/public/images/project_design/04_caller-side-desktop-view.png) | ![callee-side](https://github.com/JavaScriptForEverything/webrtc/blob/master/public/images/project_design/05_callee-side-mobile-view.png) |
+| ![caller-side](https://github.com/JavaScriptForEverything/webrtc/blob/master/public/images/project_design/09_accept-view.png) | ![callee-side](https://github.com/JavaScriptForEverything/webrtc/blob/master/public/images/project_design/10_typing_message.png) |
