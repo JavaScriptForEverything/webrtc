@@ -84,7 +84,7 @@ const createPeerConnection = () => {
 	peerConnection.addEventListener('connectionstatechange', () => {
 		if(peerConnection.connectionState === 'connected') {
 			console.log('successfully connected with other peer')
-			ui.hideLeftPanel()
+			ui.toggleLeftPanel(false) 	// hide leftPanel on connection established
 		}
 	})
 
@@ -454,6 +454,8 @@ export const sendClosingCall = () => {
 	// Step-3: Update UI: caller-side
 	ui.updateUIAfterCallClose()
 	connectedUserDetails = null
+
+	ui.toggleLeftPanel(true) 	// show leftPanel on connection close
 }
 
 // callee-side
@@ -463,6 +465,8 @@ export const handleClosingCall = (data) => {
 	// Step-3: Update UI: caller-side
 	ui.updateUIAfterCallClose()
 	connectedUserDetails = null
+
+	ui.toggleLeftPanel(true) 	// show leftPanel on connection close
 }
 
 const closePeerConnectionAndResetState = () => {

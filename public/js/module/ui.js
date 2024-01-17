@@ -31,7 +31,6 @@ const remoteVideo = $('video[name=remote-video]')
 const leftPanelToggleInput = $('#toggle-left-panel')
 const typingIndicator = $('[name=typing-indicator]')
 
-leftPanelToggleInput.checked = true
 callInputCheckbox.checked = false
 personalVideoCallButton.disabled = true
 // strangerVideoCallButton.disabled = true
@@ -59,9 +58,10 @@ export const toggleTypingIndicator = (isVisible = false) => {
 
 
 
-export const hideLeftPanel = () => {
-	leftPanelToggleInput.checked = false
+export const toggleLeftPanel = (isShown = false) => {
+	leftPanelToggleInput.checked = isShown
 }
+toggleLeftPanel(true) 									// show left panel in the begining
 
 
 
