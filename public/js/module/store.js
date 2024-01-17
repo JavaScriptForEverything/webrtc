@@ -8,7 +8,7 @@ let state = {
 	screenSharingActive: false,
 	allowConnectionsFromStrangers: false,
 
-	callState: callState.ONLY_CHAT_CALL_AVAILABLE,
+	callState: callState.ONLY_CHAT_CALL_AVAILABLE, 		// CALL-BLOCK Step-1:
 }
 
 

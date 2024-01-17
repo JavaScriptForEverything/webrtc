@@ -25,7 +25,7 @@ const outgoingCallDialog = $('[name=outgoing-call-dialog]')
 const errorCallDialog = $('[name=error-call-dialog]')
 
 const personalVideoCallButton = $('[name=personal-video-call-button]')
-const strangerVideoCallButton = $('[name=stranger-video-call-button]')
+// const strangerVideoCallButton = $('[name=stranger-video-call-button]')
 const callInputCheckbox = $('#call-button')
 const remoteVideo = $('video[name=remote-video]')
 
@@ -34,11 +34,11 @@ const remoteVideo = $('video[name=remote-video]')
 callInputCheckbox.checked = false
 
 personalVideoCallButton.disabled = true
-strangerVideoCallButton.disabled = true
+// strangerVideoCallButton.disabled = true
 
 export const toggleVideoCallButton = (isEnabled = false) => {
 	personalVideoCallButton.disabled = !isEnabled
-strangerVideoCallButton.disabled = !isEnabled
+// strangerVideoCallButton.disabled = !isEnabled
 }
 
 

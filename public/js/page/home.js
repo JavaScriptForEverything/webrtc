@@ -22,6 +22,8 @@ webRTCHandler.getLocalPreview()
 const leftPanel = $('[name=left-panel]')
 const socketIdCopyButton = $('[name=socket-id-copy-button]')
 const personalCodeInput = $('[name=personal-code-input]')
+
+const callerSocketIdP = $('[name=show-socket-id]')
 const personalChatButton = $('[name=personal-chat-button]')
 const personalVideoCallButton = $('[name=personal-video-call-button]')
 const strangerChatButton = $('[name=stranger-chat-button]')
@@ -114,51 +116,54 @@ socketIdCopyButton.addEventListener('click', () => {
 })
 
 personalChatButton.addEventListener('click', (evt) => {
-	const calleePersonalCode = personalCodeInput.value 
-	if(!calleePersonalCode) return Snackbar({
+	const callerSocketId = callerSocketIdP.textContent
+	const calleeSocketId = personalCodeInput.value 
+
+	if(!calleeSocketId || calleeSocketId === callerSocketId) return Snackbar({
 		severity: 'error',
-		message: 'calleePersonalCode is empty'
+		message: 'please use other user personal code'
 	})
 
 	const data = {
 		callType: constants.callType.PERSONAL_CHAT_CODE,
-		calleePersonalCode
+		calleePersonalCode: calleeSocketId
 	}
 	webRTCHandler.sendPreOffer(data)
 })
 personalVideoCallButton.addEventListener('click', (evt) => {
-	const calleePersonalCode = personalCodeInput.value 
-	if(!calleePersonalCode) return Snackbar({
+	const callerSocketId = callerSocketIdP.textContent
+	const calleeSocketId = personalCodeInput.value 
+	if(!calleeSocketId || calleeSocketId === callerSocketId) return Snackbar({
 		severity: 'error',
-		message: 'calleePersonalCode is empty'
+		message: 'please use other user personal code'
 	})
 
 	const args = {
 		callType: constants.callType.PERSONAL_VIDEO_CODE,
-		calleePersonalCode
+		calleePersonalCode: calleeSocketId
 	}
 	webRTCHandler.sendPreOffer(args)
 })
-strangerChatButton.addEventListener('click', (evt) => {
-	Snackbar({
-		severity: 'error',
-		message: 'Not handled yet'
-	})
+// strangerChatButton.addEventListener('click', (evt) => {
+// 	Snackbar({
+// 		severity: 'error',
+// 		message: 'Not handled yet'
+// 	})
 
-})
-strangerVideoCallButton.addEventListener('click', (evt) => {
-	Snackbar({
-		severity: 'error',
-		message: 'Not handled yet'
-	})
-})
+// })
+// strangerVideoCallButton.addEventListener('click', (evt) => {
+// 	Snackbar({
+// 		severity: 'error',
+// 		message: 'Not handled yet'
+// 	})
+// })
 
-allowFromStrangerInput.addEventListener('change', (evt) => {
-	Snackbar({
-		severity: 'error',
-		message: 'Not handled yet'
-	})
-})
+// allowFromStrangerInput.addEventListener('change', (evt) => {
+// 	Snackbar({
+// 		severity: 'error',
+// 		message: 'Not handled yet'
+// 	})
+// })
 
 
 

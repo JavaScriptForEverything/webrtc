@@ -15,7 +15,6 @@ let peerConnection = null
 let dataChannel = null
 
 
-
 export const getLocalPreview = async () => {
 	const defaultConstrain = {
 		audio: true,
@@ -29,9 +28,9 @@ export const getLocalPreview = async () => {
 	try {
 		const stream = await navigator.mediaDevices.getUserMedia(defaultConstrain)
 		store.setLocalStream( stream )
-		store.setCallState(constants.callState.CALL_AVAILABLE)
 		ui.updateLocalStream( stream )
 		ui.toggleVideoCallButton(true)
+		store.setCallState( constants.callState.CALL_AVAILABLE ) 		// CALL-BLOCK Step-2: 	step-1: set into store
 
 	} catch (error) {
 		Snackbar({
@@ -63,17 +62,23 @@ const createPeerConnection = () => {
 	/* Step-7: webrtc-step-3:
 			After share offer and answer between peers, we must  share ice candidate too (which is network details) */
 	peerConnection.addEventListener('icecandidate', (evt) => {
-		if(!evt.candidate) return Snackbar({
-			severity: 'error',
-			message: `onicecandidate event error: can't share evt.candidate`
-		})
+		/* 	if(!evt.candidate) return Snackbar({ seneraty: 'error', message: '...' })
+				...
+				This error checking is wrong, because when try to create connection
+				it tries multiple times, so it is very common failed multiple time at first
+				so we got the error even though connection stablished and it works fine a little later */
 
-		const data = {
-			connectedUserSocketId: connectedUserDetails.socketId, 	// backend check is user available or not
-			type: constants.webRTCSignaling.ICE_CANDIDATE, 					// check event type and handle data based on it
-			candidate: evt.candidate
+		if(evt.candidate) {
+			const data = {
+				connectedUserSocketId: connectedUserDetails.socketId, 	// backend check is user available or not
+				type: constants.webRTCSignaling.ICE_CANDIDATE, 					// check event type and handle data based on it
+				candidate: evt.candidate
+			}
+			wss.sendDataUsingWebRTCSignaling(data)
+
+
+			// Prevent-Call-Step-3: 
 		}
-		wss.sendDataUsingWebRTCSignaling(data)
 	})
 
 	peerConnection.addEventListener('connectionstatechange', () => {
@@ -131,13 +136,8 @@ export const sendPreOffer = ({ callType, calleePersonalCode }) => {
 		message: `calleePersonalCode is missing`
 	})
 
-	if(store.getState().callState === constants.callState.CALL_UNAVAILABLE) {
-		return wss.sendPreOffer({ 
-			callType: constants.preOfferAnswer.CALL_UNAVAILABLE, 
-			calleePersonalCode 
-		})
-	}
-	store.setCallState( constants.callState.CALL_UNAVAILABLE)
+	// CALL-BLOCK: Step-5: check is callState not `CALL_UNAVAILABLE` 	before 	`sendPreOffer`
+	if( isCallerOrCalleeAlreadyEngaged() ) return console.log('your callee busy')
 
 	/* update after sending error state: else on error return empty and userDetails will be empty
 		 which throw error */
@@ -146,10 +146,11 @@ export const sendPreOffer = ({ callType, calleePersonalCode }) => {
 		callType
 	}
 
+	
+
 	if( callType === constants.callType.PERSONAL_CHAT_CODE ||  callType === constants.callType.PERSONAL_VIDEO_CODE ) {
 		wss.sendPreOffer({ callType, calleePersonalCode })
 		ui.showOutgoingCallDialog(callType, rejectCallerCallHandler)
-
 	}
 
 }
@@ -169,15 +170,6 @@ export const handlePreOffer = ({ callType, callerSocketId }) => {
 		message: `callerSocketId is missing`
 	})
 
-	// if( !checkCallStatePosibility(callType) ) {
-	// 	sendPreOfferAnswer({ callType, preOfferAnswer: constants.preOfferAnswer.CALL_UNAVAILABLE })
-	// 	return
-	// }
-	if( store.getState().callState ===  constants.callState.CALL_UNAVAILABLE ) {
-		sendPreOfferAnswer({ callType, preOfferAnswer: constants.preOfferAnswer.CALL_UNAVAILABLE })
-		return
-	}
-	store.setCallState(constants.callState.CALL_UNAVAILABLE)
 
 	connectedUserDetails = {
 		socketId: callerSocketId,
@@ -189,16 +181,19 @@ export const handlePreOffer = ({ callType, callerSocketId }) => {
 	}
 }
 
+// callee acceptCallHandler
 const acceptCallHandler = (callType) => {
 	createPeerConnection() 	// create peerConnection when callee accept call
 
 	const preOfferAnswer = constants.preOfferAnswer.CALL_ACCEPTED
 	sendPreOfferAnswer({ callType, preOfferAnswer })
+
 }
+
+// callee rejectCallerCallHandler
 export const rejectCallHandler = (callType) => {
 	const preOfferAnswer = constants.preOfferAnswer.CALL_REJECTED
 	sendPreOfferAnswer({ callType, preOfferAnswer })
-	setInitialCallState()
 	home.hideCallPanel()
 }
 
@@ -239,13 +234,16 @@ export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 	if(preOfferAnswer === CALLEE_NOT_FOUND) {
 		ui.closeOutgoingCallDialog()
 		ui.showErrorCallDialog({ title: 'not found', message: 'callee not found' })
-		setInitialCallState()
+		// setInitialCallState()
 		home.unlockLeftPanel() 					// Step-3: 
+
+		// // CALL-BLOCK: Step-5: When Callee not found
+		// sendCallStatus( constants.callState.CALL_AVAILABLE )
 	}
 	if(preOfferAnswer === CALL_UNAVAILABLE) {
 		ui.closeOutgoingCallDialog()
 		ui.showErrorCallDialog({ title: 'unavailable', message: 'callee busy with another call' })
-		setInitialCallState()
+		// setInitialCallState()
 		home.unlockLeftPanel() 					// Step-3: 
 	}
 
@@ -253,8 +251,11 @@ export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 		ui.closeOutgoingCallDialog()
 		ui.closeIncommingCallDialog()
 		ui.showErrorCallDialog({ title: 'rejected', message: 'your call rejected' })
-		setInitialCallState()
+		// setInitialCallState()
 		home.unlockLeftPanel() 					// Step-3: 
+
+		// // CALL-BLOCK: Step-5: When Callee reject
+		// sendCallStatus( constants.callState.CALL_AVAILABLE )
 	}
 
 	if(preOfferAnswer === CALL_ACCEPTED) {
@@ -273,25 +274,27 @@ export const handlePreOfferAnswer = ({ callType, preOfferAnswer }) => {
 		const isAudioCall = callType === constants.callType.PERSONAL_CHAT_CODE
 		home.isAudioCall(isAudioCall) 	// show call panel
 
-		store.setCallState(constants.callState.CALL_UNAVAILABLE)
+		// store.setCallState(constants.callState.CALL_UNAVAILABLE)
 	}
 
 	if(preOfferAnswer === CALL_CLOSED) {
 		ui.closeOutgoingCallDialog() 		// Step-1: 
 		home.unlockLeftPanel() 					// Step-3: 
-		setInitialCallState() 					// if called available then set callState for only chat or for both
+		
+		// // CALL-BLOCK: Step-5: When Callee closed
+		// sendCallStatus( constants.callState.CALL_AVAILABLE )
 	}
 
 }
 
+
 // caller-Side: Step-5
 const sendWebRTCOffer = async () => {
-	if(!peerConnection) return Snackbar({
-		severity: 'error',
-		message: `peerConnection is empty`
-	})
+	if(!peerConnection) return Snackbar({ severity: 'error', message: `peerConnection is empty` })
+
 
 	try {
+
 		const offer = await peerConnection.createOffer()
 		await peerConnection.setLocalDescription(offer)
 
@@ -324,6 +327,7 @@ export const handleWebRTCOffer = async ({ offer }) => { 			// { connectedUserSoc
 		message: `can not sent answer because did not get offer`
 	})
 
+
 	try {
 		// make sure add offer before create answer else throw Error: => Cannot create answer in stable
 		await peerConnection.setRemoteDescription(offer)
@@ -355,6 +359,7 @@ export const handleWebRTCAnswer = async ({ answer }) => { 				// { connectedUser
 		severity: 'error',
 		message: `ice candidate not fire because did not get answer back`
 	})
+
 	
 	try {
 		await peerConnection.setRemoteDescription( answer )
@@ -372,6 +377,7 @@ export const handleWebRTCAnswer = async ({ answer }) => { 				// { connectedUser
 export const handleWebRTCIceCandidate = async ({ candidate }) => {
 	if(!peerConnection) return console.log('peerConnection is empty')	
 	if(!candidate) return console.log('no ice candidate came back')	
+
 
 	try {
 		await peerConnection.addIceCandidate(candidate)
@@ -470,31 +476,52 @@ const closePeerConnectionAndResetState = () => {
 	if(!localStream) return
 
 	localStream.getTracks().forEach(track => track.enabled = true)
-
-	setInitialCallState() 					// Reset callState after call finished
 }
 
-const checkCallStatePosibility = (callType) => {
+// const checkCallStatePosibility = (callType) => {
+// 	const { callState } = store.getState()
+// 	const { PERSONAL_VIDEO_CODE, STRANGER_VIDEO_CODE, ONLY_CHAT_CALL_AVAILABLE } = constants.callType
+	
+// 	if(callState === constants.callState.CALL_AVAILABLE) return true
+// 	if(callState === ONLY_CHAT_CALL_AVAILABLE && callType === ONLY_CHAT_CALL_AVAILABLE) return true
+
+// 	// if(
+// 	// 		(callType === PERSONAL_VIDEO_CODE || callType === STRANGER_VIDEO_CODE) && 
+// 	// 		(callState === ONLY_CHAT_CALL_AVAILABLE )
+// 	// ) return false 
+	
+// 	return false
+// }
+
+
+
+
+
+// CALL-BLOCK: Step-1: Set initial callState in store : Everybody will got it.
+// CALL-BLOCK: Step-2: Update initial callState to 'CALL_AVAILABLE' when localStream preview in video-1
+// CALL-BLOCK: Step-3: When first time call success server will send callState = CALL_AVAILABLE to every user in before exching offer
+
+// export const sendCallStatus = ( data ) => {
+export const sendCallStartSignal = ( data ) => {
+	wss.sendCallStartSignal( data )
+}
+
+// CALL-BLOCK: Step-4: Make everybody's call status 'CALL_UNAVAILABLE'
+export const handleCallStartSignal = ({ callState }) => {
+	store.setCallState( callState )	
+}
+
+// CALL-BLOCK: Step-5: check is callState not `CALL_UNAVAILABLE` 	before 	`sendPreOffer`
+// CALL-BLOCK: Step-6: After close call [peerConnection.close()] send everybody `CALL_AVAILABLE` in backend side 
+
+const isCallerOrCalleeAlreadyEngaged = () => {
 	const { callState } = store.getState()
-	const { PERSONAL_VIDEO_CODE, STRANGER_VIDEO_CODE, ONLY_CHAT_CALL_AVAILABLE } = constants.callType
-	
-	if(callState === constants.callState.CALL_AVAILABLE) return true
-	if(callState === ONLY_CHAT_CALL_AVAILABLE && callType === ONLY_CHAT_CALL_AVAILABLE) return true
 
-	// if(
-	// 		(callType === PERSONAL_VIDEO_CODE || callType === STRANGER_VIDEO_CODE) && 
-	// 		(callState === ONLY_CHAT_CALL_AVAILABLE )
-	// ) return false 
-	
+	if(callState === constants.callState.CALL_UNAVAILABLE) {
+		ui.closeOutgoingCallDialog()
+		ui.showErrorCallDialog({ title: 'unavailable', message: 'callee busy with another call' })
+		return true
+	}
+
 	return false
-}
-
-
-
-const setInitialCallState = () => {
-	const { localStream } = store.getState()
-	const { CALL_AVAILABLE, ONLY_CHAT_CALL_AVAILABLE } = constants.callState
-
-	const callState = localStream ? CALL_AVAILABLE : ONLY_CHAT_CALL_AVAILABLE
-	store.setCallState( callState )
 }

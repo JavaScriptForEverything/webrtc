@@ -38,6 +38,11 @@ export const registerSocketEvents = (socket) => {
 		socket.on('webrtc-close-connection', (data) => {
 			webRTCHandler.handleClosingCall(data)
 		})
+
+
+		socket.on('call-state', (data) => {
+			webRTCHandler.handleCallStartSignal(data)
+		})
 	})
 }
 
@@ -53,6 +58,7 @@ export const sendPreOffer = (data) => {
 export const sendPreOfferAnswer = (data) => {
 	socketIo.emit('pre-offer-answer', data)
 
+	// console.log(data)
 }
 
 // Step-5: WebRTC-step-1: callee Send offer
@@ -66,3 +72,6 @@ export const sendClosingCallSignal = (data) => {
 }
 
 
+export const sendCallStartSignal = ( data ) => { 		
+	socketIo.emit('start-call',  data )
+}

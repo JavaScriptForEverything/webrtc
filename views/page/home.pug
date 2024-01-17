@@ -13,12 +13,14 @@ block script
 			)
 			div(class='h-full w-4/5 mx-auto py-2 flex flex-col gap-2 relative')
 				label(for='toggle-left-panel'
-					class='md:hidden cursor-pointer rounded-full border border-slate-200 hover:border-slate-100 absolute top-4 right-0'
+					class='md:hidden cursor-pointer pointer-events-auto rounded-full border border-slate-200 hover:border-slate-100 absolute top-4 right-0'
 				) 
 					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 21 21"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m7.5 7.5l6 6m0-6l-6 6"/></svg>
 
 				img(src='/images/logo.png' class='w-24 h-24 border border-slate-50 rounded-full')
-				p(class='font-light') Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora nulla architecto
+				p(class='font-light') 
+					| We can call and message peer-to-peer by WebRTC without any server in the middle
+					| Which is lot more faster and secure communication 
 
 				div(name='socket-id-container' class='mt-4 px-2 py-1 rounded-md bg-blue-400/30 border border-blue-400')
 					p(class='mb-4 font-light') copy the personal code
@@ -32,15 +34,15 @@ block script
 							<svg class='w-4 h-4' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M19.4 20H9.6a.6.6 0 0 1-.6-.6V9.6a.6.6 0 0 1 .6-.6h9.8a.6.6 0 0 1 .6.6v9.8a.6.6 0 0 1-.6.6"/><path d="M15 9V4.6a.6.6 0 0 0-.6-.6H4.6a.6.6 0 0 0-.6.6v9.8a.6.6 0 0 0 .6.6H9"/></g></svg>
 
 
-				form(name='personal-code-container' class='mt-2')
+				form(name='personal-code-container' class='mt-2 ')
 					p(class='mb-1') Personal Code
-					input(name='personal-code-input' type='text' placeholder='paste code here' value=''
+					input(name='personal-code-input' type='text' autocomplete='off' placeholder='paste code here' value=''
 						class='mb-2 px-2 py-1 w-full rounded-md outline-none border border-blue-400'
 						class='text-slate-200 bg-blue-400/50 placeholder:text-slate-400'
 						class='focus:border-blue-300'
 					)
 
-					div(class='grid grid-cols-2 gap-2')
+					div(class='grid grid-cols-2 gap-2 mb-4')
 						button(name='personal-chat-button' type='button' 
 							class='flex gap-1 justify-center items-center px-1 py-1 border border-blue-400 rounded'
 							class='hover:border-blue-300/80 hover:text-slate-100'
@@ -59,7 +61,7 @@ block script
 							span(class='pointer-events-none') video call
 
 
-				form(name='stranger-code-container' class='mt-2')
+				//- form(name='stranger-code-container' class='mt-2')
 					p(class='mb-1') Stranger Code
 					div(class='grid grid-cols-2 gap-2')
 						button(name='stranger-chat-button' type='button' 
@@ -79,7 +81,7 @@ block script
 							<svg class='w-6 h-6 pointer-events-none' xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 12V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2zm0 0l4-4v8z"/></svg>
 							span(class='pointer-events-none') video call
 
-				div(class='flex-1 mt-4 flex items-end ')
+				//- div(class='flex-1 mt-4 flex items-end ')
 					div(name='allow-from-stranger' class='flex items-center gap-1')
 						input(type='checkbox' id='checkbox' class='w-4 h-4 cursor-pointer') 
 						label(for='checkbox' class='cursor-pointer') allow from stranger
