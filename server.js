@@ -10,4 +10,4 @@ const io = new Server(httpServer)
 io.on('connect', socketController(io))
 
 const PORT = process.env.PORT || 5000
-httpServer.listen(PORT, () => console.log(`server on: http://localhost:${PORT}`))
+httpServer.listen(PORT, async () => console.log(`server on: http://localhost:${PORT}`))

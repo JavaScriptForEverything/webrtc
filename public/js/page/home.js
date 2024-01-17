@@ -49,10 +49,8 @@ const messageContainer = $('[name=message-container]')
 const sendMessageContainer = $('[name=send-message-container]')
 const sendMessageInput = $('input[name=send-message-input]')
 const sendMessageButton = $('button[name=send-message-button]')
-const leftPanelToggleInput = $('#toggle-left-panel')
 
 // Reset to default
-leftPanelToggleInput.checked = true
 
 personalCodeInput.value = ''
 microphoneInputCheckbox.checked = false 	

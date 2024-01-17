@@ -28,11 +28,10 @@ const personalVideoCallButton = $('[name=personal-video-call-button]')
 // const strangerVideoCallButton = $('[name=stranger-video-call-button]')
 const callInputCheckbox = $('#call-button')
 const remoteVideo = $('video[name=remote-video]')
+const leftPanelToggleInput = $('#toggle-left-panel')
 
-
-
+leftPanelToggleInput.checked = true
 callInputCheckbox.checked = false
-
 personalVideoCallButton.disabled = true
 // strangerVideoCallButton.disabled = true
 
@@ -51,6 +50,9 @@ export const toggleVideoCallButton = (isEnabled = false) => {
 
 
 
+export const hideLeftPanel = () => {
+	leftPanelToggleInput.checked = false
+}
 
 
 

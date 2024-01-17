@@ -84,6 +84,7 @@ const createPeerConnection = () => {
 	peerConnection.addEventListener('connectionstatechange', () => {
 		if(peerConnection.connectionState === 'connected') {
 			console.log('successfully connected with other peer')
+			ui.hideLeftPanel()
 		}
 	})
 
