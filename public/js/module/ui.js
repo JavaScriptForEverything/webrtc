@@ -25,7 +25,6 @@ const outgoingCallDialog = $('[name=outgoing-call-dialog]')
 const errorCallDialog = $('[name=error-call-dialog]')
 
 const personalVideoCallButton = $('[name=personal-video-call-button]')
-// const strangerVideoCallButton = $('[name=stranger-video-call-button]')
 const callInputCheckbox = $('#call-button')
 const remoteVideo = $('video[name=remote-video]')
 const leftPanelToggleInput = $('#toggle-left-panel')
@@ -33,13 +32,18 @@ const typingIndicator = $('[name=typing-indicator]')
 
 callInputCheckbox.checked = false
 personalVideoCallButton.disabled = true
-// strangerVideoCallButton.disabled = true
+
+
+
+export const toggleLeftPanel = (isShown = false) => {
+	leftPanelToggleInput.checked = isShown
+}
+toggleLeftPanel(true) 									// show left panel in the begining
+
 
 export const toggleVideoCallButton = (isEnabled = false) => {
 	personalVideoCallButton.disabled = !isEnabled
-// strangerVideoCallButton.disabled = !isEnabled
 }
-
 
 
 let timer = 0
@@ -52,16 +56,6 @@ export const toggleTypingIndicator = (isVisible = false) => {
 		// typingIndicator.style.display = !isVisible ? 'block' : 'none'
 	}, 3000);
 }
-// toggleTypingIndicator(true)
-
-
-
-
-
-export const toggleLeftPanel = (isShown = false) => {
-	leftPanelToggleInput.checked = isShown
-}
-toggleLeftPanel(true) 									// show left panel in the begining
 
 
 
