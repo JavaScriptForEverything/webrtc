@@ -470,15 +470,15 @@ const closePeerConnectionAndResetState = () => {
 // CALL-BLOCK: Step-2: Update initial callState to 'CALL_AVAILABLE' when localStream preview in video-1
 // CALL-BLOCK: Step-3: When first time call success server will send callState = CALL_AVAILABLE to every user in before exching offer
 
-// export const sendCallStatus = ( data ) => {
-export const sendCallStartSignal = ( data ) => {
-	wss.sendCallStartSignal( data )
-}
+// // export const sendCallStatus = ( data ) => {
+// export const sendCallStartSignal = ( data ) => {
+// 	wss.sendCallStartSignal( data )
+// }
 
-// CALL-BLOCK: Step-4: Make everybody's call status 'CALL_UNAVAILABLE'
-export const handleCallStartSignal = ({ callState }) => {
-	store.setCallState( callState )	
-}
+// // CALL-BLOCK: Step-4: Make everybody's call status 'CALL_UNAVAILABLE'
+// export const handleCallStartSignal = ({ callState }) => {
+// 	store.setCallState( callState )	
+// }
 
 // CALL-BLOCK: Step-5: check is callState not `CALL_UNAVAILABLE` 	before 	`sendPreOffer`
 // CALL-BLOCK: Step-6: After close call [peerConnection.close()] send everybody `CALL_AVAILABLE` in backend side 

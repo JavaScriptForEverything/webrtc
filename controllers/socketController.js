@@ -11,11 +11,11 @@ module.exports = (io) => (socket) => {
 	connectedPeers.push(socket.id)
 	console.log(connectedPeers)
 
-	const [ callerId, calleeId ] = callingPeers
+	// const [ callerId, calleeId ] = callingPeers
 
-	if( callingPeers.includes(callerId) && callingPeers.includes(calleeId) ) {
-		io.emit('call-state', { callState: callState.CALL_UNAVAILABLE })
-	}
+	// if( callingPeers.includes(callerId) && callingPeers.includes(calleeId) ) {
+	// 	io.emit('call-state', { callState: callState.CALL_UNAVAILABLE })
+	// }
 
 	socket.on('pre-offer', ({ callType, calleePersonalCode }) => {
 		const connectedPeer = connectedPeers.find( peerSocketId => peerSocketId === calleePersonalCode)
@@ -66,9 +66,9 @@ module.exports = (io) => (socket) => {
 		/*  Step-3: check already connected both peers or not
 				callerSocketId = socket.id, 	calleeSocketId = data.connectedUserSocketId
 		*/
-		if(callingPeers.includes(socket.id) && callingPeers.includes(data.connectedUserSocketId)) {
-			io.emit('call-state', { callState: callState.CALL_UNAVAILABLE })
-		}
+		// if(callingPeers.includes(socket.id) && callingPeers.includes(data.connectedUserSocketId)) {
+		// 	io.emit('call-state', { callState: callState.CALL_UNAVAILABLE })
+		// }
 
 		io.to(data.connectedUserSocketId).emit('webrtc-signaling', data)
 	})

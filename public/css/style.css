@@ -610,6 +610,10 @@ video {
   bottom: 1rem;
 }
 
+.end-0 {
+  inset-inline-end: 0px;
+}
+
 .left-0 {
   left: 0px;
 }
@@ -648,10 +652,6 @@ video {
 
 .top-4 {
   top: 1rem;
-}
-
-.end-0 {
-  inset-inline-end: 0px;
 }
 
 .z-10 {
@@ -694,11 +694,6 @@ video {
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
-}
-
-.my-4 {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
 }
 
 .mb-1 {
